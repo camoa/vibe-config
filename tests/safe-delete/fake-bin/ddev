@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Fake ddev: log each call's arguments; fail snapshot when FAKE_DDEV_FAIL_SNAPSHOT=1.
+echo "$*" >> "$FAKE_DDEV_LOG"
+if [ "$1" = "snapshot" ] && [ "${FAKE_DDEV_FAIL_SNAPSHOT:-}" = "1" ]; then
+  exit 1
+fi
+exit 0
