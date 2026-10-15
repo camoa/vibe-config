@@ -48,7 +48,7 @@ node_installed=false; have node && node_installed=true
 npm_installed=false; have npm && npm_installed=true
 
 ready=false
-if [ "$runtime_running" = true ] && [ "$ddev_installed" = true ] \
+if [ "$os" != unsupported ] && [ "$runtime_running" = true ] && [ "$ddev_installed" = true ] \
   && [ "$node_installed" = true ] && [ "$npm_installed" = true ]; then
   ready=true
 fi
