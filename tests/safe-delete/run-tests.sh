@@ -27,9 +27,9 @@ check() { if eval "$2"; then pass "$1"; else fail "$1"; fi; }
 run_pty() {
   local answer="$1"
   shift
-  : > "$FAKE_DDEV_LOG"
+  : > "$FAKE_DDEV_LOG"; rm -f "$FAKE_DDEV_LOG.snapshots"
   if [ "$pty_form" = linux ]; then
-    printf '%s\n' "$answer" | script -q -e -c "bash $script $*" /dev/null > "$tmp/out" 2>&1
+    printf '%s\n' "$answer" | script -q -e -c "$(printf '%q ' bash "$script" "$@")" /dev/null > "$tmp/out" 2>&1
   else
     printf '%s\n' "$answer" | script -q /dev/null bash "$script" "$@" > "$tmp/out" 2>&1
   fi
@@ -82,6 +82,10 @@ check "no-snapshot: no snapshot line" '! grep -q "^snapshot" "$FAKE_DDEV_LOG" &&
 FAKE_DDEV_FAIL_SNAPSHOT=1 run_pty demo demo
 check "failed snapshot: exit 1" '[ $rc -eq 1 ]'
 check "failed snapshot: no delete line" '! grep -q "^delete" "$FAKE_DDEV_LOG"'
+
+FAKE_DDEV_SILENT_FAIL_SNAPSHOT=1 run_pty demo demo
+check "silent failed snapshot: exit 1" '[ $rc -eq 1 ]'
+check "silent failed snapshot: no delete line" '! grep -q "^delete" "$FAKE_DDEV_LOG"'
 
 # Folder handling
 make_project demo demo

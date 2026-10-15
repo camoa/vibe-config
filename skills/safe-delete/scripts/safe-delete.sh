@@ -80,13 +80,16 @@ if [ "$answer" != "$project" ]; then
 fi
 
 if [ "$snapshot" = 1 ]; then
+  # ddev can print "Failed to snapshot" and still exit 0, so confirm the snapshot is listed.
   ddev snapshot --name "$snapshot_name" "$project" || { echo "Snapshot failed. Nothing was deleted." >&2; exit 1; }
+  ddev snapshot --list "$project" 2>/dev/null | grep -q "$snapshot_name" || { echo "Snapshot not found. Nothing was deleted." >&2; exit 1; }
 fi
 ddev delete --omit-snapshot --yes "$project" || { echo "ddev delete failed." >&2; exit 1; }
 echo "Deleted project $project."
 
 if [ -n "$folder" ]; then
-  if [ -n "$kept" ] && [ -d "$folder/.ddev/db_snapshots" ]; then
+  if [ -n "$kept" ]; then
+    [ -d "$folder/.ddev/db_snapshots" ] || { echo "No snapshots found in the folder; folder kept." >&2; exit 1; }
     mv "$folder/.ddev/db_snapshots" "$kept" || { echo "Could not move snapshots; folder kept." >&2; exit 1; }
     echo "Snapshots kept in $kept"
   fi
