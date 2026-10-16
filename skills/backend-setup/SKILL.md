@@ -63,7 +63,7 @@ Recover in the project folder with:
 ddev drush sql:drop -y && ddev restart
 ```
 
-The restart runs the start hook again, and it installs Drupal on the empty database.
+The restart runs the start hook again, and it installs Drupal on the empty database. Then run the setup script again on the same folder. It skips the clone and writes `AGENTS.md`, installs the skills and prints the login link.
 
 ## The three resets
 
@@ -74,6 +74,8 @@ When the person asks to reset, find out which of these they mean.
 3. **Delete the project**: send this to the safe-delete skill. Only the person deletes a project. Never run DDEV's delete command yourself, and never remove the project folder yourself.
 
 ## When a step fails
+
+After you fix the cause, run the setup script again on the same folder. It skips the clone and finishes the steps it missed.
 
 The script stops with a message and leaves the folder and the DDEV project as they are.
 

@@ -54,6 +54,8 @@ mkdir -p "$dest"
 for skill in "${skills[@]}"; do
   rm -rf "${dest:?}/$skill"
   cp -R "$tmp/skills/$skill" "$dest/$skill"
+  # MIT asks that the licence travel with each copy.
+  cp "$tmp/LICENSE" "$dest/$skill/LICENSE"
 done
 printf 'repo: %s\ncommit: %s\n' "$DRUPAL_SKILLS_REPO" "$commit" > "$dest/drupal-claude-skills.pin"
 echo "Installed ${skills[*]} at $commit into $dest"

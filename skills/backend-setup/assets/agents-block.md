@@ -10,8 +10,10 @@ the text between the BEGIN and END markers; keep your own notes outside them.
 - Log in with `ddev drush user:login`, which prints a one-time login link.
 
 ### Configuration
-- After every configuration change, run `ddev drush cex -y` and commit
-  `config/sync`. Check for drift with `ddev drush config:status`.
+- After every configuration change, run `ddev drush cex -y`, then read
+  `git diff config/sync` and commit only the changes you made. Check for drift
+  first with `ddev drush config:status`. Where an installed skill gives a
+  different export rule, this block wins.
 - Use `-y` in scripts so a command does not wait for an answer.
 
 ### How to build

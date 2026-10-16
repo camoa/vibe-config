@@ -64,6 +64,8 @@ if [ -e "$folder" ] && [ -n "$(ls -A "$folder" 2>/dev/null)" ]; then
     || die "$folder exists and is not empty; choose a new folder"
   rerun=1
 fi
+[ -n "$rerun" ] || [ "$source_repo" != "$DEFAULT_SOURCE" ] \
+  || die "the default template source is a placeholder until the template is published; pass --source"
 command -v ddev >/dev/null 2>&1 \
   || die "ddev is not installed; run the machine-check skill to set it up"
 
@@ -82,9 +84,13 @@ if [ -z "$rerun" ]; then
   git switch -q -C main
   # The clone may leave its default or cloned branch beside main; no local
   # branch keeps tracking the template.
+  # A branch the clone leaves beside main goes when main holds it; one that
+  # holds other commits stays, with no upstream.
   git for-each-ref --format='%(refname:short)' refs/heads/ | while read -r b; do
-    git branch --unset-upstream "$b" 2>/dev/null || true
+    [ "$b" = main ] && continue
+    git branch -q -d "$b" 2>/dev/null || git branch --unset-upstream "$b" 2>/dev/null || true
   done
+  git branch --unset-upstream main 2>/dev/null || true
   git remote rename origin template
 fi
 
