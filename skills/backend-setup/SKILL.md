@@ -10,7 +10,7 @@ This skill gives the person a local Drupal site, built from the backend template
 ## Before you start
 
 1. Run the machine-check skill first: `bash scripts/check-machine.sh` in that skill. Go on only when its JSON says `ready` is true. Otherwise, show the person what it reports and stop.
-2. Agree the project folder with the person. It must not exist yet, or must be empty, and it must be outside this skill's folder. Pass an absolute path; a relative one is resolved from the folder you run the script in.
+2. Agree the project folder with the person. It must not exist yet, or must be empty, and it must be outside this skill's folder. Pass an absolute path; a relative one is resolved from the folder you run the script in. Its parent folder must already exist.
 3. The DDEV project name is the folder name. A folder named like an existing DDEV project fails at `ddev start`. Run `ddev list` and pick a name that is not there.
 
 ## Set up the site

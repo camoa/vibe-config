@@ -6,7 +6,9 @@ set -euo pipefail
 # Placeholder until the template is published; pass --source meanwhile.
 DEFAULT_SOURCE="https://github.com/OWNER/vibe-config-drupal-backend.git"
 DEFAULT_REF="1cd1bb525327ffdfb7b5cf8ea0e48325b5b4b500"
-script_dir="$(cd "$(dirname "$0")" && pwd)"
+# An inherited CDPATH would make cd print a path or pick another folder.
+CDPATH=
+script_dir="$(cd "$(dirname "$0")" && pwd -P)"
 
 usage() {
   cat <<USAGE
@@ -41,11 +43,17 @@ done
 [ -n "$folder" ] || { usage >&2; die "no project folder given"; }
 
 # Resolve the folder to an absolute path, so a relative name never lands
-# inside this skill when the script runs from the skill's own folder.
-parent="$(cd "$(dirname "$folder")" 2>/dev/null && pwd)" \
-  || die "the parent folder of $folder does not exist"
-folder="$parent/$(basename "$folder")"
-skill_dir="$(cd "$script_dir/.." && pwd)"
+# inside this skill when the script runs from the skill's own folder. pwd -P
+# resolves symlinks on both sides of the comparison.
+name="$(basename "$folder")"
+case "$name" in
+  .|..) die "name the project folder itself, not . or .." ;;
+esac
+parent="$(cd "$(dirname "$folder")" 2>/dev/null && pwd -P)" \
+  || die "the parent folder of $folder does not exist; create it first"
+folder="$parent/$name"
+if [ -d "$folder" ]; then folder="$(cd "$folder" && pwd -P)"; fi
+skill_dir="$(cd "$script_dir/.." && pwd -P)"
 case "$folder/" in
   "$skill_dir"/*) die "$folder is inside the skill folder $skill_dir; choose a folder outside it" ;;
 esac
@@ -72,7 +80,11 @@ if [ -z "$rerun" ]; then
   # The project sits on a local main that tracks nothing, so the person's
   # commits land on a branch and they can add their own origin.
   git switch -q -C main
-  git branch --unset-upstream 2>/dev/null || true
+  # The clone may leave its default or cloned branch beside main; no local
+  # branch keeps tracking the template.
+  git for-each-ref --format='%(refname:short)' refs/heads/ | while read -r b; do
+    git branch --unset-upstream "$b" 2>/dev/null || true
+  done
   git remote rename origin template
 fi
 
