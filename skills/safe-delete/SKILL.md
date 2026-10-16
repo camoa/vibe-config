@@ -9,7 +9,7 @@ There are three kinds of reset. Pick the mildest one that does the job.
 
 1. **Undo recent changes.** Run `ddev snapshot restore --latest`, or `ddev snapshot restore <name>` for a named snapshot. The agent may run this itself.
 2. **A fresh install that keeps config.** Use the `backend-setup` skill. Do this only on a site made from the vibe-config-drupal-backend template, and only after a snapshot. Tell the person that content will be lost. This skill carries no fresh-install command of its own. Never delete the project to get a fresh install.
-3. **Delete the DDEV project.** This is only the person's, through the delete script in `scripts/safe-delete.sh`.
+3. **Delete the DDEV project.** This is only the person's, through the delete script, `skills/safe-delete/scripts/safe-delete.sh` in this repository.
 
 On any other site, offer only the restore and the delete.
 
@@ -21,7 +21,7 @@ A snapshot covers the database only. It does not cover `sites/default/files`, co
 
 - The agent never runs `ddev delete` and never runs the script itself.
 - The agent never fakes a terminal (a pseudo-terminal, `script`, piped input) to get past the script's confirmation. The script refuses without a real terminal on purpose.
-- The agent hands the person the exact command to run in their own terminal:
+- The agent hands the person the exact command to run in their own terminal. Before handing it over, the agent replaces the script path with its absolute path on this machine, because the person runs it from the DDEV project folder:
 
 ```
 skills/safe-delete/scripts/safe-delete.sh [--no-snapshot] [--remove-folder PATH] PROJECT
