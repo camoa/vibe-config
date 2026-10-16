@@ -40,6 +40,16 @@ while [ $# -gt 0 ]; do
 done
 [ -n "$folder" ] || { usage >&2; die "no project folder given"; }
 
+# Resolve the folder to an absolute path, so a relative name never lands
+# inside this skill when the script runs from the skill's own folder.
+parent="$(cd "$(dirname "$folder")" 2>/dev/null && pwd)" \
+  || die "the parent folder of $folder does not exist"
+folder="$parent/$(basename "$folder")"
+skill_dir="$(cd "$script_dir/.." && pwd)"
+case "$folder/" in
+  "$skill_dir"/*) die "$folder is inside the skill folder $skill_dir; choose a folder outside it" ;;
+esac
+
 rerun=""
 if [ -e "$folder" ] && [ -n "$(ls -A "$folder" 2>/dev/null)" ]; then
   git --git-dir="$folder/.git" remote get-url template >/dev/null 2>&1 \
@@ -58,7 +68,13 @@ elif [[ "$ref" =~ ^[0-9a-f]{7,40}$ ]] || ! git clone --branch "$ref" "$source_re
   git -C "$folder" checkout "$ref" || die "ref $ref not found in $source_repo"
 fi
 cd "$folder"
-[ -n "$rerun" ] || git remote rename origin template
+if [ -z "$rerun" ]; then
+  # The project sits on a local main that tracks nothing, so the person's
+  # commits land on a branch and they can add their own origin.
+  git switch -q -C main
+  git branch --unset-upstream 2>/dev/null || true
+  git remote rename origin template
+fi
 
 # ddev start runs the template's init.sh, which installs Drupal; its output
 # passes through so WARNING and ERROR lines stay visible.

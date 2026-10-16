@@ -10,15 +10,15 @@ This skill gives the person a local Drupal site, built from the backend template
 ## Before you start
 
 1. Run the machine-check skill first: `bash scripts/check-machine.sh` in that skill. Go on only when its JSON says `ready` is true. Otherwise, show the person what it reports and stop.
-2. Agree the project folder with the person. It must not exist yet, or must be empty.
+2. Agree the project folder with the person. It must not exist yet, or must be empty, and it must be outside this skill's folder. Pass an absolute path; a relative one is resolved from the folder you run the script in.
 3. The DDEV project name is the folder name. A folder named like an existing DDEV project fails at `ddev start`. Run `ddev list` and pick a name that is not there.
 
 ## Set up the site
 
-Run from this skill's folder:
+Run this skill's script:
 
 ```bash
-bash scripts/setup-backend.sh [--source <git URL or path>] [--ref <tag, branch or commit>] <project-folder>
+bash <this-skill-folder>/scripts/setup-backend.sh [--source <git URL or path>] [--ref <tag, branch or commit>] <project-folder>
 ```
 
 - `--source` is the template's git URL or a local path. The default source is a placeholder until the template is published, so pass `--source` until then.
@@ -26,8 +26,8 @@ bash scripts/setup-backend.sh [--source <git URL or path>] [--ref <tag, branch o
 
 The script does these steps in order:
 
-1. It clones the template into the folder, on branch `main`, with the template's remote named `template`. The person can add their own `origin`.
-2. It runs `ddev start`. The template's start hook installs Drupal, so this step takes a few minutes.
+1. It clones the template at the requested ref into the folder. The project then sits on a local branch `main` that tracks nothing, and the template's remote is named `template`. The person can add their own `origin`.
+2. It runs `ddev start`. The template's start hook installs Drupal, so this step takes about a minute.
 3. It checks that the home page answers 200.
 4. It writes the vibe-config-drupal rules block into the project's `AGENTS.md` (`scripts/write-agents-block.sh`).
 5. It installs the pinned `drupal-ddev` and `drupal-config-mgmt` skills into the project's `.claude/skills/` (`scripts/install-drupal-skills.sh`).

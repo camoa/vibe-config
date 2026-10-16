@@ -21,7 +21,8 @@ the text between the BEGIN and END markers; keep your own notes outside them.
   drupal/<module>`, then `ddev drush en <module> -y`, then export config.
 
 ### The three kinds of reset
-- Undo: `ddev snapshot restore` returns the database to the last snapshot.
+- Undo: `ddev snapshot restore --latest` returns the database to the last
+  snapshot.
 - Fresh install: take `ddev snapshot` first, then run
   `ddev drush sql:drop -y && ddev restart`.
 - Delete the project: only the person does this, through the safe-delete
