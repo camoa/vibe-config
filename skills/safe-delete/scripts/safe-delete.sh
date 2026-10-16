@@ -17,6 +17,10 @@ while [ $# -gt 0 ]; do
     --no-snapshot) snapshot=0 ;;
     --remove-folder)
       [ $# -ge 2 ] || usage
+      if [ -z "$2" ]; then
+        echo "Refusing: --remove-folder needs a folder path. Nothing was deleted." >&2
+        exit 2
+      fi
       folder="$2"
       shift
       ;;

@@ -107,6 +107,11 @@ check "mismatched folder: folder kept, log empty" '[ -d "$tmp/work/demo" ] && [ 
 run_pty demo --remove-folder / demo
 check "root refused: exit 2" '[ $rc -eq 2 ]'
 
+run_pty demo --remove-folder "" demo
+check "empty folder value: exit 2" '[ $rc -eq 2 ]'
+check "empty folder value: says why" 'grep -q "needs a folder path" "$tmp/out"'
+check "empty folder value: log empty" '[ ! -s "$FAKE_DDEV_LOG" ]'
+
 if [ $fails -eq 0 ]; then
   echo "all passed"
   exit 0
