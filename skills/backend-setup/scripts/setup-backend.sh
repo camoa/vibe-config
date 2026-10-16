@@ -44,9 +44,12 @@ fi
 command -v ddev >/dev/null 2>&1 \
   || die "ddev is not installed; run the machine-check skill to set it up"
 
-git clone "$source_repo" "$folder" || die "git clone of $source_repo failed"
+# --branch takes a branch or tag; a commit needs a full clone, then checkout.
+if ! git clone --branch "$ref" "$source_repo" "$folder"; then
+  git clone "$source_repo" "$folder" || die "git clone of $source_repo failed"
+  git -C "$folder" checkout "$ref" || die "ref $ref not found in $source_repo"
+fi
 cd "$folder"
-git checkout -B main "$ref" 2>/dev/null || git checkout -B main "origin/$ref" || die "ref $ref not found in $source_repo"
 git remote rename origin template
 
 # ddev start runs the template's init.sh, which installs Drupal; its output
