@@ -69,7 +69,7 @@ The restart runs the start hook again, and it installs Drupal on the empty datab
 
 When the person asks to reset, find out which of these they mean.
 
-1. **Undo** a recent change: `ddev snapshot restore`. It restores the latest snapshot.
+1. **Undo** a recent change: `ddev snapshot restore --latest`. It restores the latest snapshot.
 2. **Fresh install**, on sites made from this template only. Warn the person first that all content and configuration in the database is lost. When they agree, run `ddev snapshot` first, then `ddev drush sql:drop -y && ddev restart`. The restart installs Drupal again.
 3. **Delete the project**: send this to the safe-delete skill. Only the person deletes a project. Never run DDEV's delete command yourself, and never remove the project folder yourself.
 
