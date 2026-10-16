@@ -47,10 +47,10 @@ git -C "$tmp" checkout -q FETCH_HEAD
 commit="$(git -C "$tmp" rev-parse HEAD)"
 
 dest="$folder/.claude/skills"
-mkdir -p "$dest"
 for skill in "${skills[@]}"; do
   [ -f "$tmp/skills/$skill/SKILL.md" ] || die "$skill/SKILL.md not found at $ref"
 done
+mkdir -p "$dest"
 for skill in "${skills[@]}"; do
   rm -rf "${dest:?}/$skill"
   cp -R "$tmp/skills/$skill" "$dest/$skill"
