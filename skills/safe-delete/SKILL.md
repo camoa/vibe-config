@@ -1,13 +1,19 @@
 ---
 name: safe-delete
-description: Use when a person asks to delete, remove, wipe or reset a DDEV project or its database. Covers the reset path (ddev snapshot restore) and the delete script the person runs in their own terminal.
+description: Use when a person asks to delete, remove, wipe or reset a DDEV project or its database. Covers the three kinds of reset (snapshot restore, fresh install keeping config, delete) and the delete script the person runs in their own terminal.
 ---
 
 # Safe delete
 
 ## Reset is a restore, never a delete
 
-When the person wants to reset a site, run `ddev snapshot restore --latest`, or `ddev snapshot restore NAME` for a named snapshot. Do not delete the project to reset it.
+A reset is one of three things. Ask which one the person means when it is not clear.
+
+1. **Undo recent changes.** Run `ddev snapshot restore --latest`, or `ddev snapshot restore NAME` for a named snapshot. The agent may do this.
+2. **Fresh install that keeps config.** First take a snapshot, for example `ddev snapshot --name before-reinstall-<timestamp>`. Then run `ddev drush sql:drop -y && ddev restart`. The template reinstalls from `config/sync`: config comes back, content is lost. The agent may do this, only after the snapshot, and tells the person that content will be lost. If a snapshot named `seed` exists, the restart loads it instead of a fresh install (see below).
+3. **Delete the DDEV project.** Only the person does this, through the delete script below. The agent never runs `ddev delete` or the script, and never fakes a terminal.
+
+Never delete the project to undo changes or to reinstall.
 
 A snapshot covers the database only. It does not cover `sites/default/files`, code or exported config. Say so when you offer a restore, and never imply files are backed up.
 
