@@ -6,6 +6,7 @@ set -euo pipefail
 # Placeholder until the template is published; pass --source meanwhile.
 DEFAULT_SOURCE="https://github.com/OWNER/vibe-config-drupal-backend.git"
 DEFAULT_REF="1cd1bb525327ffdfb7b5cf8ea0e48325b5b4b500"
+script_dir="$(cd "$(dirname "$0")" && pwd)"
 
 usage() {
   cat <<USAGE
@@ -62,6 +63,7 @@ site_url="$(ddev exec 'echo $DDEV_PRIMARY_URL' | tr -d '\r')" \
   || die "could not read the site URL from the DDEV container"
 status="$(curl -sk -o /dev/null -w '%{http_code}' "$site_url" || true)"
 [ "$status" = "200" ] || die "home page $site_url answered $status, not 200"
+"$script_dir/write-agents-block.sh" .
 
 login_link="$(ddev drush user:login | tr -d '\r')" \
   || die "ddev drush user:login failed; the site is up at $site_url"
