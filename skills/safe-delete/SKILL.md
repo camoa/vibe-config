@@ -21,8 +21,6 @@ A snapshot covers the database only. It does not cover `sites/default/files`, co
 
 The agent never runs `ddev delete` and never runs the delete script itself. The script refuses to run without a terminal and asks the person to type the project name, so only the person can complete it.
 
-Never fake a terminal to get past that check, for example with `script`, `expect` or `unbuffer`, and never feed the project name to the script yourself. The typed name is the person's confirmation.
-
 Hand the person the exact command to run in their own terminal, with the project name filled in and the script's full path, resolved from this skill's own folder. A relative path fails from the project folder or when the skill is installed elsewhere:
 
 ```
