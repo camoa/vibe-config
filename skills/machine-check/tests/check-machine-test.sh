@@ -37,5 +37,15 @@ if grep -nE '\bjq\b|brew |\$\{[a-z_]+,,\}|readlink -f|sed -i|grep -P' "$script" 
   echo "FAIL forbidden pattern in script"; fail=1
 fi
 
+# Re-run these cases under bash 3.2 when the image is already local. Never pull.
+if [ -z "${IN_BASH32:-}" ]; then
+  if command -v docker >/dev/null 2>&1 && docker image inspect bash:3.2 >/dev/null 2>&1; then
+    docker run --rm --network none -e IN_BASH32=1 -v "$here/..:/mc:ro" bash:3.2 \
+      bash /mc/tests/check-machine-test.sh || { echo "FAIL under bash:3.2"; fail=1; }
+  else
+    echo "note: bash:3.2 run skipped (docker or the bash:3.2 image is absent)"
+  fi
+fi
+
 [ "$fail" = 0 ] && echo "all cases passed"
 exit "$fail"
