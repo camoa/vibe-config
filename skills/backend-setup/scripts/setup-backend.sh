@@ -44,8 +44,9 @@ fi
 command -v ddev >/dev/null 2>&1 \
   || die "ddev is not installed; run the machine-check skill to set it up"
 
-# --branch takes a branch or tag; a commit needs a full clone, then checkout.
-if ! git clone --branch "$ref" "$source_repo" "$folder"; then
+# --branch takes a branch or tag. A commit hash skips it, so git prints no
+# "Remote branch not found" before the full clone and checkout.
+if [[ "$ref" =~ ^[0-9a-f]{7,40}$ ]] || ! git clone --branch "$ref" "$source_repo" "$folder"; then
   git clone "$source_repo" "$folder" || die "git clone of $source_repo failed"
   git -C "$folder" checkout "$ref" || die "ref $ref not found in $source_repo"
 fi
