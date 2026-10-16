@@ -46,7 +46,7 @@ command -v ddev >/dev/null 2>&1 \
 
 git clone "$source_repo" "$folder" || die "git clone of $source_repo failed"
 cd "$folder"
-git checkout -B main "$ref" || die "ref $ref not found in $source_repo"
+git checkout -B main "$ref" 2>/dev/null || git checkout -B main "origin/$ref" || die "ref $ref not found in $source_repo"
 git remote rename origin template
 
 # ddev start runs the template's init.sh, which installs Drupal; its output
@@ -54,10 +54,12 @@ git remote rename origin template
 ddev start || die "ddev start failed; see the output above"
 
 # shellcheck disable=SC2016 # expands inside the web container
-site_url="$(ddev exec 'echo $DDEV_PRIMARY_URL' | tr -d '\r')"
+site_url="$(ddev exec 'echo $DDEV_PRIMARY_URL' | tr -d '\r')" \
+  || die "could not read the site URL from the DDEV container"
 status="$(curl -sk -o /dev/null -w '%{http_code}' "$site_url" || true)"
 [ "$status" = "200" ] || die "home page $site_url answered $status, not 200"
 
-login_link="$(ddev drush user:login | tr -d '\r')"
+login_link="$(ddev drush user:login | tr -d '\r')" \
+  || die "ddev drush user:login failed; the site is up at $site_url"
 echo "Site URL: $site_url"
 echo "Login link: $login_link"
