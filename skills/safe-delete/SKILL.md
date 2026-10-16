@@ -15,10 +15,10 @@ A snapshot covers the database only. It does not cover `sites/default/files`, co
 
 The agent never runs `ddev delete` and never runs the delete script itself. The script refuses to run without a terminal and asks the person to type the project name, so only the person can complete it.
 
-Hand the person the exact command to run in their own terminal, with the project name filled in and the script's full path, resolved from this skill's own folder. A relative path fails from the project folder or when the skill is installed elsewhere:
+Hand the person the exact command to run in their own terminal, with the project name filled in:
 
 ```
-FULL_PATH_TO_THIS_SKILL/scripts/safe-delete.sh PROJECT
+skills/safe-delete/scripts/safe-delete.sh PROJECT
 ```
 
 Options:
