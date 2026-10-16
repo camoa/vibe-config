@@ -13,7 +13,8 @@ usage() {
 Usage: $(basename "$0") [--source <git URL or path>] [--ref <tag, branch or commit>] <project-folder>
 
 Clones the backend template into <project-folder>, which must not exist or be
-empty, then runs ddev start. The DDEV project name is the folder name.
+empty, then runs ddev start. The DDEV project name is the folder name. Run again
+on a folder this script set up, it skips the clone and refreshes AGENTS.md.
 
 Options:
   --source  Template git URL or local path. Default: $DEFAULT_SOURCE
@@ -39,20 +40,25 @@ while [ $# -gt 0 ]; do
 done
 [ -n "$folder" ] || { usage >&2; die "no project folder given"; }
 
+rerun=""
 if [ -e "$folder" ] && [ -n "$(ls -A "$folder" 2>/dev/null)" ]; then
-  die "$folder exists and is not empty; choose a new folder"
+  git --git-dir="$folder/.git" remote get-url template >/dev/null 2>&1 \
+    || die "$folder exists and is not empty; choose a new folder"
+  rerun=1
 fi
 command -v ddev >/dev/null 2>&1 \
   || die "ddev is not installed; run the machine-check skill to set it up"
 
 # --branch takes a branch or tag. A commit hash skips it, so git prints no
 # "Remote branch not found" before the full clone and checkout.
-if [[ "$ref" =~ ^[0-9a-f]{7,40}$ ]] || ! git clone --branch "$ref" "$source_repo" "$folder"; then
+if [ -n "$rerun" ]; then
+  :
+elif [[ "$ref" =~ ^[0-9a-f]{7,40}$ ]] || ! git clone --branch "$ref" "$source_repo" "$folder"; then
   git clone "$source_repo" "$folder" || die "git clone of $source_repo failed"
   git -C "$folder" checkout "$ref" || die "ref $ref not found in $source_repo"
 fi
 cd "$folder"
-git remote rename origin template
+[ -n "$rerun" ] || git remote rename origin template
 
 # ddev start runs the template's init.sh, which installs Drupal; its output
 # passes through so WARNING and ERROR lines stay visible.

@@ -24,7 +24,8 @@ elif ! grep -qxF "$begin" "$target"; then
   if [ -s "$target" ]; then printf '\n' >> "$target"; fi
   printf '%s\n' "$BLOCK" >> "$target"
 else
-  grep -qxF "$end" "$target" || die "$target has $begin but no $end; fix it by hand"
+  awk -v b="$begin" -v e="$end" '$0 == b { on = 1 } on && $0 == e { found = 1; exit } END { exit !found }' "$target" \
+    || die "$target has $begin but no $end after it; fix it by hand"
   tmp="$(mktemp "$target.XXXXXX")"
   awk -v b="$begin" -v e="$end" '
     $0 == b && !done { print ENVIRON["BLOCK"]; skip = 1; next }
