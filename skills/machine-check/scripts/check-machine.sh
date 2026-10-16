@@ -92,30 +92,35 @@ if [ "$os" = unsupported ]; then
 fi
 if [ "$runtime_running" != true ]; then
   case "$os:$runtime_known" in
-    macos:true) add_step container "Open your container app (OrbStack or Docker Desktop) and wait until it says it is running." true ;;
-    macos:*) add_step container "Install the OrbStack app from orbstack.dev, or Docker Desktop from docker.com, then open it once." true ;;
-    wsl2:true) add_step container "Start the Docker service inside WSL2, then run this check again." true ;;
-    wsl2:*) add_step container "Run the DDEV Windows installer from Windows (docs.ddev.com, Windows install). It also installs Docker CE inside WSL2." true ;;
-    *:true) add_step container "Start the Docker service, then run this check again." true ;;
-    *) add_step container "Install Docker CE as docs.ddev.com describes for Linux, add yourself to the docker group, then log in again." true ;;
+    macos:true) add_step container "Start your container app and wait until it runs. In Terminal run one of: open -a OrbStack, open -a Docker (Docker Desktop), colima start (Colima)." true ;;
+    macos:*) add_step container "Install OrbStack or Docker Desktop as https://docs.ddev.com/en/stable/users/install/docker-installation/ describes, then open it once." true ;;
+    wsl2:true) add_step container "Inside WSL2 run: sudo systemctl start docker. Then run this check again." true ;;
+    wsl2:*) add_step container "Run the DDEV Windows installer from Windows, as https://docs.ddev.com/en/stable/users/install/ddev-installation/ describes. It also installs Docker CE inside WSL2." true ;;
+    *:true) add_step container "Run: sudo systemctl start docker. Then run this check again." true ;;
+    *) add_step container "Install Docker CE as https://docs.ddev.com/en/stable/users/install/docker-installation/ describes for Linux, add yourself to the docker group, then log in again." true ;;
   esac
 fi
 if [ "$ddev_installed" != true ]; then
   case "$os" in
     macos) add_step ddev "In Terminal run: curl -fsSL https://ddev.com/install.sh | bash. It may ask for your password." true ;;
-    wsl2) add_step ddev "Run the DDEV Windows installer from Windows (docs.ddev.com, Windows install)." true ;;
-    *) add_step ddev "Install DDEV with the Linux steps at docs.ddev.com (installation page)." true ;;
+    wsl2) add_step ddev "Run the DDEV Windows installer from Windows, as https://docs.ddev.com/en/stable/users/install/ddev-installation/ describes." true ;;
+    *) add_step ddev "Install DDEV with the Linux steps at https://docs.ddev.com/en/stable/users/install/ddev-installation/" true ;;
   esac
 fi
-node_person=false; [ "$os" = macos ] && node_person=true
 if [ "$node_installed" != true ]; then
   if [ "$os" = macos ]; then
-    add_step node "Install Node.js with the installer from nodejs.org/en/download." true
+    add_step node "Install Node.js with the installer from https://nodejs.org/en/download" true
   else
-    add_step node "Install nvm from github.com/nvm-sh/nvm, then run: nvm install --lts" false
+    add_step node "Install nvm from https://github.com/nvm-sh/nvm, then run: nvm install --lts" false
   fi
 fi
-[ "$npm_installed" = true ] || add_step npm "Install npm, which comes with Node.js." "$node_person"
+if [ "$npm_installed" != true ]; then
+  if [ "$os" = macos ]; then
+    add_step npm "Reinstall Node.js with the installer from https://nodejs.org/en/download. It includes npm." true
+  else
+    add_step npm "Run: nvm install --lts. It installs npm with Node.js (nvm: https://github.com/nvm-sh/nvm)." false
+  fi
+fi
 
 checks=$(printf '{"container":{"running":%s,"provider":"%s","via":"%s"},"ddev":{"installed":%s,"version":"%s"},"node":{"installed":%s,"version":"%s"},"npm":{"installed":%s,"version":"%s"}}' \
   "$runtime_running" "$(json_escape "$provider")" "$via" \

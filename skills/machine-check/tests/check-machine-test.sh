@@ -6,6 +6,18 @@ tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
 fail=0
 
+# Every run that prints JSON must parse. bash:3.2 has neither parser, so only there it is skipped.
+if command -v python3 >/dev/null 2>&1; then parser=python3
+elif command -v jq >/dev/null 2>&1; then parser=jq
+else parser=none; echo "note: JSON parse check skipped (neither python3 nor jq is on PATH)"
+fi
+check_json() { # label
+  case "$parser" in
+    python3) printf '%s' "$out" | python3 -m json.tool >/dev/null 2>&1 || { echo "FAIL $1: invalid JSON: $out"; fail=1; } ;;
+    jq) printf '%s' "$out" | jq . >/dev/null 2>&1 || { echo "FAIL $1: invalid JSON: $out"; fail=1; } ;;
+  esac
+}
+
 stub() { # name body
   printf '#!/bin/sh\n%s\n' "$2" > "$tmp/bin/$1"
   chmod +x "$tmp/bin/$1"
@@ -16,9 +28,7 @@ run_case() { # label expected_os uname_s uname_r
   stub uname "if [ \"\$1\" = -s ]; then echo $3; else echo $4; fi"
   out=$(PATH="$tmp/bin:$PATH" WSL_DISTRO_NAME="" bash "$script"); code=$?
   if [ -r /proc/sys/fs/binfmt_misc/WSLInterop ] && [ "$2" = linux ]; then return; fi
-  if command -v python3 >/dev/null 2>&1; then
-    printf '%s' "$out" | python3 -m json.tool >/dev/null || { echo "FAIL $1: invalid JSON"; fail=1; }
-  fi
+  check_json "$1"
   case "$out" in
     *"\"os\":\"$2\""*) ;;
     *) echo "FAIL $1: expected os $2, got $out"; fail=1 ;;
@@ -36,7 +46,7 @@ iso_start() { # uname_s
   ln -s "$(command -v sed)" "$tmp/bin/sed"; ln -s "$(command -v tr)" "$tmp/bin/tr"
   stub uname "if [ \"\$1\" = -s ]; then echo $1; else echo 6.1.0-generic; fi"
 }
-iso_run() { out=$(PATH="$tmp/bin" WSL_DISTRO_NAME="" "$BASH" "$script"); }
+iso_run() { out=$(PATH="$tmp/bin" WSL_DISTRO_NAME="" "$BASH" "$script"); check_json "isolated run"; }
 expect() { # label substring
   case "$out" in
     *"$2"*) ;;
@@ -71,6 +81,7 @@ expect "docker unknown provider" '"provider":"unknown","via":"docker-info"'
 iso_start Linux; stub docker 'exit 1'
 iso_run
 expect "docker stopped" '"container":{"running":false,"provider":"unknown","via":"docker-info"}'
+expect "docker stopped step" 'Run: sudo systemctl start docker. Then run this check again.","person_runs":true'
 
 iso_start Linux
 iso_run
@@ -89,21 +100,25 @@ for os in Darwin Linux; do
   refuse "$os sudo" "sudo"
 done
 iso_start Darwin; iso_run
-expect "macos container person" 'orbstack.dev, or Docker Desktop from docker.com, then open it once.","person_runs":true'
+expect "macos container person" 'docker-installation/ describes, then open it once.","person_runs":true'
 expect "macos ddev person" 'It may ask for your password.","person_runs":true'
-expect "macos node person" 'nodejs.org/en/download.","person_runs":true'
+expect "macos node person" 'https://nodejs.org/en/download","person_runs":true'
 stub uname "if [ \"\$1\" = -s ]; then echo Linux; else echo 5.15.0-Microsoft-standard-WSL2; fi"; iso_run
 for piece in container ddev node npm; do expect "wsl2 step $piece" "\"piece\":\"$piece\""; done
 expect "wsl2 container person" 'installs Docker CE inside WSL2.","person_runs":true'
-expect "wsl2 ddev person" 'docs.ddev.com, Windows install).","person_runs":true'
+expect "wsl2 ddev person" 'ddev-installation/ describes.","person_runs":true'
 expect "wsl2 node agent" 'nvm install --lts","person_runs":false'
 refuse "wsl2 brew" "brew"
 
 # Summary mode and the forbidden-pattern check.
 summary=$(bash "$script" --summary); [ -n "$summary" ] || { echo "FAIL summary empty"; fail=1; }
 case "$summary" in *[Hh]ard*|*unusual*) echo "FAIL summary warns about difficulty"; fail=1 ;; esac
-if grep -nE '\bjq\b|brew |sudo |declare -A|mapfile|readarray|\$\{[a-z_]+(,,|\^\^|,|\^)\}|readlink -f|sed -i|grep -P' "$script" | grep -v '^[0-9]*:#'; then
+if grep -nE '\bjq\b|brew |declare -A|mapfile|readarray|\$\{[a-z_]+(,,|\^\^|,|\^)\}|readlink -f|sed -i|grep -P' "$script" | grep -v '^[0-9]*:#'; then
   echo "FAIL forbidden pattern in script"; fail=1
+fi
+# sudo may appear only inside a step's text, never as a command the script runs.
+if grep -n 'sudo ' "$script" | grep -v '^[0-9]*:#' | grep -v 'add_step '; then
+  echo "FAIL script runs sudo"; fail=1
 fi
 
 # Re-run these cases under bash 3.2 when the image is already local. Never pull.
