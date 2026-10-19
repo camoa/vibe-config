@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { getSession } from "@/lib/session";
 import { isSignedIn } from "@/lib/auth-state";
 import { fetchArticles, backendIsUp } from "@/lib/drupal";
@@ -13,6 +14,8 @@ const Down = () => (
 
 async function Home({ searchParams }: { searchParams: Promise<{ backend?: string }> }) {
   const forcedDown = (await searchParams).backend === "down";
+  // The session read checks expiry against the clock, so render per request.
+  await connection();
   const session = await getSession();
 
   if (!isSignedIn(session)) {
