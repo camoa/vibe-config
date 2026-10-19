@@ -4,5 +4,5 @@ import { getSession } from "@/lib/session";
 export async function POST() {
   (await getSession()).destroy();
   const base = process.env.DRUPAL_BASE_URL!.replace(/\/$/, "");
-  return NextResponse.redirect(`${base}/user/logout`, 303);
+  return NextResponse.redirect(`${base}/user/logout/confirm?destination=/user/login`, 303);
 }
