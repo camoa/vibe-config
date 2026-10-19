@@ -87,6 +87,10 @@ FAKE_DDEV_SILENT_FAIL_SNAPSHOT=1 run_pty demo demo
 check "silent failed snapshot: exit 1" '[ $rc -eq 1 ]'
 check "silent failed snapshot: no delete line" '! grep -q "^delete" "$FAKE_DDEV_LOG"'
 
+FAKE_DDEV_NEAR_SNAPSHOT=1 run_pty demo demo
+check "only a longer snapshot name listed: exit 1" '[ $rc -eq 1 ]'
+check "only a longer snapshot name listed: no delete line" '! grep -q "^delete" "$FAKE_DDEV_LOG"'
+
 # Folder handling
 make_project demo demo
 run_pty demo demo
@@ -103,6 +107,16 @@ make_project demo other
 run_pty demo --remove-folder "$tmp/work/demo" demo
 check "mismatched folder: exit 2" '[ $rc -eq 2 ]'
 check "mismatched folder: folder kept, log empty" '[ -d "$tmp/work/demo" ] && [ ! -s "$FAKE_DDEV_LOG" ]'
+
+# A relative folder that CDPATH would resolve to another project's folder named demo.
+make_project demo other
+mkdir -p "$tmp/cdpath/demo/.ddev"
+printf 'name: demo\n' > "$tmp/cdpath/demo/.ddev/config.yaml"
+cd "$tmp/work" || exit 1
+CDPATH="$tmp/cdpath" run_pty demo --remove-folder demo demo
+cd "$here" || exit 1
+check "CDPATH exported, relative folder: exit 2" '[ $rc -eq 2 ]'
+check "CDPATH exported, relative folder: both folders kept, log empty" '[ -d "$tmp/work/demo" ] && [ -d "$tmp/cdpath/demo" ] && [ ! -s "$FAKE_DDEV_LOG" ]'
 
 run_pty demo --remove-folder / demo
 check "root refused: exit 2" '[ $rc -eq 2 ]'
