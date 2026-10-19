@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
-# Create a local Drupal backend: clone the template at a pinned ref into a new
+# Create a local Drupal backend: clone the template at a ref into a new
 # folder, start it with DDEV, check the login page and print a login link.
 set -euo pipefail
 
-# Placeholder until the template is published; pass --source meanwhile.
-DEFAULT_SOURCE="https://github.com/OWNER/vibe-config-drupal-backend.git"
-DEFAULT_REF="1cd1bb525327ffdfb7b5cf8ea0e48325b5b4b500"
+DEFAULT_SOURCE="https://github.com/camoa/vibe-config-drupal-backend.git"
+DEFAULT_REF="v0.1.0"
 # An inherited CDPATH would make cd print a path or pick another folder.
 CDPATH=
 script_dir="$(cd "$(dirname "$0")" && pwd -P)"
@@ -20,8 +19,8 @@ on a folder this script set up, it skips the clone and refreshes AGENTS.md.
 
 Options:
   --source  Template git URL or local path. Default: $DEFAULT_SOURCE
-            (a placeholder until the template is published; pass --source).
-  --ref     Template tag, branch or commit. Default: $DEFAULT_REF
+  --ref     Template tag, branch or commit. Default: $DEFAULT_REF, the template
+            release these skills were tested with. --ref main gets the latest.
   --help    Print this help.
 USAGE
 }
@@ -64,8 +63,6 @@ if [ -e "$folder" ] && [ -n "$(ls -A "$folder" 2>/dev/null)" ]; then
     || die "$folder exists and is not empty; choose a new folder"
   rerun=1
 fi
-[ -n "$rerun" ] || [ "$source_repo" != "$DEFAULT_SOURCE" ] \
-  || die "the default template source is a placeholder until the template is published; pass --source"
 command -v ddev >/dev/null 2>&1 \
   || die "ddev is not installed; run the machine-check skill to set it up"
 
@@ -74,8 +71,18 @@ command -v ddev >/dev/null 2>&1 \
 if [ -n "$rerun" ]; then
   :
 elif [[ "$ref" =~ ^[0-9a-f]{7,40}$ ]] || ! git clone --branch "$ref" "$source_repo" "$folder"; then
+  made_folder=""
+  [ -e "$folder" ] || made_folder=1
   git clone "$source_repo" "$folder" || die "git clone of $source_repo failed"
-  git -C "$folder" checkout "$ref" || die "ref $ref not found in $source_repo"
+  if ! git -C "$folder" checkout "$ref" --; then
+    # Remove only the clone this run made, so a rerun with a good ref starts clean.
+    if [ -n "$made_folder" ]; then
+      rm -rf -- "$folder"
+    else
+      find "$folder" -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+    fi
+    die "ref $ref not found in $source_repo; the clone was removed, so run setup again with a valid --ref"
+  fi
 fi
 cd "$folder"
 if [ -z "$rerun" ]; then
@@ -84,8 +91,8 @@ if [ -z "$rerun" ]; then
   git switch -q -C main
   # The clone may leave its default or cloned branch beside main; no local
   # branch keeps tracking the template.
-  # A branch the clone leaves beside main goes when main holds it; one that
-  # holds other commits stays, with no upstream.
+  # git branch -d removes a branch that main or the branch's own upstream
+  # holds; a branch neither holds stays, with no upstream.
   git for-each-ref --format='%(refname:short)' refs/heads/ | while read -r b; do
     [ "$b" = main ] && continue
     git branch -q -d "$b" 2>/dev/null || git branch --unset-upstream "$b" 2>/dev/null || true
