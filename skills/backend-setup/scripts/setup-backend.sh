@@ -4,7 +4,7 @@
 set -euo pipefail
 
 DEFAULT_SOURCE="https://github.com/camoa/vibe-config-drupal-backend.git"
-DEFAULT_REF="main"
+DEFAULT_REF="v0.1.0"
 # An inherited CDPATH would make cd print a path or pick another folder.
 CDPATH=
 script_dir="$(cd "$(dirname "$0")" && pwd -P)"
@@ -19,7 +19,8 @@ on a folder this script set up, it skips the clone and refreshes AGENTS.md.
 
 Options:
   --source  Template git URL or local path. Default: $DEFAULT_SOURCE
-  --ref     Template tag, branch or commit. Default: $DEFAULT_REF
+  --ref     Template tag, branch or commit. Default: $DEFAULT_REF, the template
+            release these skills were tested with. --ref main gets the latest.
   --help    Print this help.
 USAGE
 }
