@@ -5,7 +5,8 @@ import { getSession } from "@/lib/session";
 
 export async function GET() {
   try {
-    await fetch(process.env.DRUPAL_BASE_URL!, { method: "HEAD" });
+    const res = await fetch(process.env.DRUPAL_BASE_URL!, { method: "HEAD" });
+    if (res.status >= 500 || res.status === 404) throw new Error("down");
   } catch {
     return NextResponse.redirect(appUrl("/?backend=down"));
   }
