@@ -43,6 +43,8 @@ Sign-in uses Drupal's own login form. Logout drops the tokens from the app's ses
 
 In code you write for the app, signed in means the session holds an access token, never just a name. Use `isSignedIn` in `lib/auth-state.ts`.
 
+Token refresh is safe within one server process only, such as `npm run dev` or a single `next start`; with several processes or serverless instances, two refreshes at once can sign the person out.
+
 Simple OAuth has no revoke endpoint, so a token already issued stays valid for up to 300 seconds after logout, and a refresh token until its lifetime ends. Tell the person this if they ask how final a logout is.
 
 ## When a step fails
