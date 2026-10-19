@@ -28,7 +28,7 @@ The script does these steps in order:
 
 1. It clones the template at the requested ref into the folder. The project then sits on a local branch `main` that tracks nothing, and the template's remote is named `template`. The person can add their own `origin`.
 2. It runs `ddev start`. The template's start hook installs Drupal, so this step takes about a minute.
-3. It checks that the home page answers 200.
+3. It checks that the login page, `/user/login`, answers 200. The template may close the front page to visitors, so the script does not check it.
 4. It writes the vibe-config-drupal rules block into the project's `AGENTS.md` (`scripts/write-agents-block.sh`).
 5. It installs the pinned `drupal-ddev` and `drupal-config-mgmt` skills into the project's `.claude/skills/` (`scripts/install-drupal-skills.sh`).
 6. It prints a `Site URL:` line and a `Login link:` line. Give both to the person.
@@ -82,4 +82,4 @@ The script stops with a message and leaves the folder and the DDEV project as th
 - `ddev` is missing: run the machine-check skill and follow what it says.
 - The folder exists and is not empty: pick another folder, or ask the person.
 - `ddev start` fails: show the person the output. A name clash with another DDEV project is a common cause. See "Before you start".
-- The home page does not answer 200: show the person the status and the `ddev start` output.
+- The login page does not answer 200: show the person the status and the `ddev start` output.

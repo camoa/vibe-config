@@ -101,8 +101,8 @@ ddev start || die "ddev start failed; see the output above"
 # shellcheck disable=SC2016 # expands inside the web container
 site_url="$(ddev exec 'echo $DDEV_PRIMARY_URL' | tr -d '\r')" \
   || die "could not read the site URL from the DDEV container"
-status="$(curl -sk -o /dev/null -w '%{http_code}' "$site_url" || true)"
-[ "$status" = "200" ] || die "home page $site_url answered $status, not 200"
+status="$(curl -sk -o /dev/null -w '%{http_code}' "$site_url/user/login" || true)"
+[ "$status" = "200" ] || die "login page $site_url/user/login answered $status, not 200"
 "$script_dir/write-agents-block.sh" .
 "$script_dir/install-drupal-skills.sh" .
 
