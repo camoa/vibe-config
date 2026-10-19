@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Fake ddev: log each call's arguments (not --list); fail snapshot when FAKE_DDEV_FAIL_SNAPSHOT=1;
+# exit 0 without keeping the snapshot when FAKE_DDEV_SILENT_FAIL_SNAPSHOT=1, as real ddev can.
+snaps="$FAKE_DDEV_LOG.snapshots"
+if [ "$1" = "snapshot" ] && [ "$2" = "--list" ]; then
+  cat "$snaps" 2>/dev/null
+  exit 0
+fi
+echo "$*" >> "$FAKE_DDEV_LOG"
+if [ "$1" = "snapshot" ]; then
+  [ "${FAKE_DDEV_FAIL_SNAPSHOT:-}" = "1" ] && exit 1
+  [ "${FAKE_DDEV_SILENT_FAIL_SNAPSHOT:-}" = "1" ] && exit 0
+  echo "$3" >> "$snaps"
+fi
+exit 0
