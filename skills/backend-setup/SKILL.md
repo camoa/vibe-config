@@ -35,7 +35,7 @@ The script does these steps in order:
 
 The admin password is random. To log in later, run `ddev drush user:login` in the project folder.
 
-Running the script again on a folder it set up skips the clone and refreshes `AGENTS.md`. A new `AGENTS.md` is untracked in the project's git, and so is the new `.claude/` folder. Offer to commit both.
+Running the script again on a folder it set up skips the clone and refreshes `AGENTS.md`. It keeps the template that folder already holds: when `--source` or `--ref` asks for another, it prints a note, and the person sets up a new folder to switch. A new `AGENTS.md` is untracked in the project's git, and so is the new `.claude/` folder. Offer to commit both.
 
 The One Line Installer is an optional helper for getting DDEV. This skill does not need it.
 

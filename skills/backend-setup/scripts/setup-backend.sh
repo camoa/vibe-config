@@ -30,10 +30,12 @@ die() { echo "Error: $*" >&2; exit 1; }
 source_repo="$DEFAULT_SOURCE"
 ref="$DEFAULT_REF"
 folder=""
+source_given=""
+ref_given=""
 while [ $# -gt 0 ]; do
   case "$1" in
-    --source) [ $# -ge 2 ] || die "--source needs a value"; source_repo="$2"; shift 2 ;;
-    --ref) [ $# -ge 2 ] || die "--ref needs a value"; ref="$2"; shift 2 ;;
+    --source) [ $# -ge 2 ] || die "--source needs a value"; source_repo="$2"; source_given=1; shift 2 ;;
+    --ref) [ $# -ge 2 ] || die "--ref needs a value"; ref="$2"; ref_given=1; shift 2 ;;
     --help|-h) usage; exit 0 ;;
     -*) usage >&2; die "unknown option: $1" ;;
     *) [ -z "$folder" ] || die "only one project folder allowed"; folder="$1"; shift ;;
@@ -69,7 +71,15 @@ command -v ddev >/dev/null 2>&1 \
 # --branch takes a branch or tag. A commit hash skips it, so git prints no
 # "Remote branch not found" before the full clone and checkout.
 if [ -n "$rerun" ]; then
-  :
+  kept_source="$(git -C "$folder" remote get-url template)"
+  kept_commit="$(git -C "$folder" rev-parse HEAD)"
+  ref_commit="$(git -C "$folder" rev-parse -q --verify "$ref^{commit}" 2>/dev/null \
+    || git -C "$folder" rev-parse -q --verify "template/$ref^{commit}" 2>/dev/null || true)"
+  if { [ -n "$source_given" ] && [ "$source_repo" != "$kept_source" ]; } \
+    || { [ -n "$ref_given" ] && ! { [ -n "$ref_commit" ] && git -C "$folder" merge-base --is-ancestor "$ref_commit" "$kept_commit"; }; }; then
+    echo "Note: $folder already holds the template from $kept_source at ${kept_commit:0:7}, and this run kept it."
+    echo "      --source and --ref apply only to a new folder. To use another template or ref, run setup on a new folder."
+  fi
 elif [[ "$ref" =~ ^[0-9a-f]{7,40}$ ]] || ! git clone --branch "$ref" "$source_repo" "$folder"; then
   made_folder=""
   [ -e "$folder" ] || made_folder=1
