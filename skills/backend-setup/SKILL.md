@@ -21,8 +21,8 @@ Run this skill's script:
 bash <this-skill-folder>/scripts/setup-backend.sh [--source <git URL or path>] [--ref <tag, branch or commit>] <project-folder>
 ```
 
-- `--source` is the template's git URL or a local path. The default source is a placeholder until the template is published, so pass `--source` until then.
-- `--ref` is a template tag, branch or commit. The default is the pinned template commit. `--help` prints both defaults.
+- `--source` is the template's git URL or a local path. The default is https://github.com/camoa/vibe-config-drupal-backend.git.
+- `--ref` is a template tag, branch or commit. The default is `main`. `--help` prints both defaults.
 
 The script does these steps in order:
 
@@ -77,7 +77,7 @@ When the person asks to reset, find out which of these they mean.
 
 After you fix the cause, run the setup script again on the same folder. It skips the clone and finishes the steps it missed.
 
-The script stops with a message and leaves the folder and the DDEV project as they are.
+The script stops with a message and leaves the folder and the DDEV project as they are. One exception: when `--ref` names no tag, branch or commit in the template, the script removes the clone it just made, so run it again on the same folder with a valid `--ref`.
 
 - `ddev` is missing: run the machine-check skill and follow what it says.
 - The folder exists and is not empty: pick another folder, or ask the person.
