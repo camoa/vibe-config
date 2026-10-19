@@ -21,6 +21,9 @@ the text between the BEGIN and END markers; keep your own notes outside them.
   only when no configuration or contributed module covers the need.
 - Installing a contributed module is allowed: `ddev composer require
   drupal/<module>`, then `ddev drush en <module> -y`, then export config.
+- A new block type, or an entity type or bundle whose access ignores "access
+  content" (block_content above all): disable it in JSON:API Extras, export,
+  commit, then check an anonymous GET of its collection gives 404 or no data.
 
 ### The three kinds of reset
 - Undo: `ddev snapshot restore --latest` returns the database to the last
