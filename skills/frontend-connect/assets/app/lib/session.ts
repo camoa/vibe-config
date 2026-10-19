@@ -15,6 +15,8 @@ export async function getSession(): Promise<IronSession<SessionData>> {
   return getIronSession<SessionData>(await cookies(), {
     password: process.env.SESSION_SECRET!,
     cookieName: "session",
+    // Two tokens fill most of one 4096-byte cookie; split rather than fail sign-in.
+    chunk: true,
     cookieOptions: {
       httpOnly: true,
       sameSite: "lax",

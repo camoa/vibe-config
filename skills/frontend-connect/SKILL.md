@@ -11,7 +11,7 @@ This skill gives the person a Next.js app wired to their Drupal backend for sign
 
 1. Run the machine-check skill first: `bash scripts/check-machine.sh` in that skill. Go on only when its JSON says `ready` is true. Otherwise, show the person what it reports and stop.
 2. Node 22.13 or later and `mkcert` must be installed. The script checks both.
-3. The backend must be running, and it must carry the template's oauth-login work: the Simple OAuth client `nextjs` with redirect URI `http://localhost:3000/api/auth/callback`. A backend made from the template's main before that work lands has no such client. Until then, make the backend with backend-setup and `--ref feature/oauth-login`.
+3. The backend must be running, and it must carry the Simple OAuth client `nextjs` with redirect URI `http://localhost:3000/api/auth/callback`. A backend made by backend-setup at its default template ref has it.
 4. Propose an app folder beside the backend folder, for example `<backend-folder>-app`. It must not exist yet, or must be empty. Tell the person the path and wait for their agreement before you run the script.
 
 ## Create the app
@@ -42,6 +42,8 @@ Running the script again on an app it made skips create-next-app and the install
 Sign-in uses Drupal's own login form. Logout drops the tokens from the app's session and then sends the person to Drupal's logout page, which asks for one confirm click. That ends the Drupal login.
 
 In code you write for the app, signed in means the session holds an access token, never just a name. Use `isSignedIn` in `lib/auth-state.ts`.
+
+Token refresh is safe within one server process only, such as `npm run dev` or a single `next start`; with several processes or serverless instances, two refreshes at once can sign the person out.
 
 Simple OAuth has no revoke endpoint, so a token already issued stays valid for up to 300 seconds after logout, and a refresh token until its lifetime ends. Tell the person this if they ask how final a logout is.
 
