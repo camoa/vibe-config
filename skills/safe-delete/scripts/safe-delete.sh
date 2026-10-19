@@ -48,7 +48,8 @@ if [ -n "$folder" ]; then
     echo "Refusing: $folder has no .ddev/config.yaml." >&2
     exit 2
   fi
-  folder=$(cd "$folder" && pwd -P) || exit 2
+  # An exported CDPATH would make cd pick another folder and print its path.
+  folder=$(CDPATH='' cd -- "$folder" && pwd -P) || exit 2
   if [ "$folder" = "/" ] || [ "$folder" = "$(cd "$HOME" && pwd -P)" ]; then
     echo "Refusing to remove $folder." >&2
     exit 2
@@ -86,7 +87,8 @@ fi
 if [ "$snapshot" = 1 ]; then
   # ddev can print "Failed to snapshot" and still exit 0, so confirm the snapshot is listed.
   ddev snapshot --name "$snapshot_name" "$project" || { echo "Snapshot failed. Nothing was deleted." >&2; exit 1; }
-  ddev snapshot --list "$project" 2>/dev/null | grep -q "$snapshot_name" || { echo "Snapshot not found. Nothing was deleted." >&2; exit 1; }
+  # The list is a table; split it into words and match the whole name as a fixed string.
+  ddev snapshot --list "$project" 2>/dev/null | LC_ALL=C tr -cs 'A-Za-z0-9._-' '\n' | grep -Fqx -- "$snapshot_name" || { echo "Snapshot not found. Nothing was deleted." >&2; exit 1; }
 fi
 ddev delete --omit-snapshot --yes "$project" || { echo "ddev delete failed." >&2; exit 1; }
 echo "Deleted project $project."
