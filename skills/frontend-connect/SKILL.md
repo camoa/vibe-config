@@ -31,15 +31,23 @@ The script does these steps in order:
 5. It sets the `dev` script so `npm run dev` exports `NODE_EXTRA_CA_CERTS` from `mkcert -CAROOT` before `next dev`. Node rejects DDEV's mkcert certificate without it and reads the variable only at launch. npm runs scripts through `sh`, so this does not work under plain Windows cmd.
 6. It writes `.env.local` once, with `DRUPAL_BASE_URL`, `DRUPAL_CLIENT_ID`, `DRUPAL_SCOPE`, `APP_URL` and a random `SESSION_SECRET`.
 7. It stops unless git confirms `.env.local` is ignored.
-8. It prints `App folder:`, `Backend URL:` and the start command. Give them to the person.
+8. It prints `App folder:`, `Backend URL:`, the start command and the next steps. Give them to the person.
+
+npm may report "high severity vulnerabilities". They come from the lint tooling create-next-app adds (`eslint-config-next`, through `braces`), not the running app. Leave them, and never run `npm audit fix --force`: it breaks the pinned versions.
 
 No Drupal host sits in the app's source. To point the app at another backend, edit `DRUPAL_BASE_URL` in `.env.local` only.
 
 Running the script again on an app it made skips create-next-app and the install, copies the app files over the app again, and never touches `.env.local`.
 
+## The next step
+
+Tell the person, in plain words: open the backend's login link, run `npm run dev`, click Sign in, then tell you what the app needs to store.
+
 ## Sign-in and logout
 
-Sign-in uses Drupal's own login form. Logout drops the tokens from the app's session and then sends the person to Drupal's logout page, which asks for one confirm click. That ends the Drupal login.
+Sign-in uses Drupal's own login form. To sign in, open the backend's login link first, or run `ddev drush uli` in the backend folder for a new one if it expired. Then click Sign in. The `nextjs` client skips the consent screen, so a person logged in to Drupal goes straight through with no password.
+
+Logout drops the tokens from the app's session and then sends the person to Drupal's logout page, which asks for one confirm click. That ends the Drupal login. Logout ends on Drupal's sign-in page, which is expected; the person goes back to the app's address, http://localhost:3000, to sign in again.
 
 In code you write for the app, signed in means the session holds an access token, never just a name. Use `isSignedIn` in `lib/auth-state.ts`.
 
