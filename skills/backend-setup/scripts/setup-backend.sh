@@ -74,7 +74,7 @@ elif [[ "$ref" =~ ^[0-9a-f]{7,40}$ ]] || ! git clone --branch "$ref" "$source_re
   made_folder=""
   [ -e "$folder" ] || made_folder=1
   git clone "$source_repo" "$folder" || die "git clone of $source_repo failed"
-  if ! git -C "$folder" checkout "$ref"; then
+  if ! git -C "$folder" checkout "$ref" --; then
     # Remove only the clone this run made, so a rerun with a good ref starts clean.
     if [ -n "$made_folder" ]; then
       rm -rf -- "$folder"
