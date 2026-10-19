@@ -38,7 +38,10 @@ async function Home({ searchParams }: { searchParams: Promise<{ backend?: string
       {result.kind === "error" && (
         <p>Drupal answered with an error (status {result.status}).</p>
       )}
-      {result.kind === "ok" && (
+      {result.kind === "ok" && result.articles.length === 0 && (
+        <p>No content yet. Ask your agent to set up the content your app needs.</p>
+      )}
+      {result.kind === "ok" && result.articles.length > 0 && (
         <ul>
           {result.articles.map((a) => (
             <li key={a.id}>{a.title}</li>
