@@ -31,11 +31,11 @@ The script does these steps in order:
 3. It checks that the login page, `/user/login`, answers 200. The template may close the front page to visitors, so the script does not check it.
 4. It writes the vibe-config rules block into the project's `AGENTS.md` (`scripts/write-agents-block.sh`).
 5. It installs the pinned `drupal-ddev` and `drupal-config-mgmt` skills into the project's `.claude/skills/` (`scripts/install-drupal-skills.sh`).
-6. It prints a `Site URL:` line and a `Login link:` line. Give both to the person.
+6. It prints a `Site URL:` line and a `Login link:` line. Give both to the person, and tell them to open the login link in their browser. It signs them in to Drupal with no password, so the app's Sign in later goes straight through.
 
 The admin password is random. To log in later, run `ddev drush user:login` in the project folder.
 
-Running the script again on a folder it set up skips the clone and refreshes `AGENTS.md`. A new `AGENTS.md` is an uncommitted change in the project's git. Offer to commit it.
+Running the script again on a folder it set up skips the clone and refreshes `AGENTS.md`. A new `AGENTS.md` is untracked in the project's git, and so is the new `.claude/` folder. Offer to commit both.
 
 The One Line Installer is an optional helper for getting DDEV. This skill does not need it.
 
