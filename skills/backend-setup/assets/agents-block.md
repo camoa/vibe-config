@@ -25,9 +25,9 @@ the text between the BEGIN and END markers; keep your own notes outside them.
 ### The three kinds of reset
 - Undo: `ddev snapshot restore --latest` returns the database to the last
   snapshot.
-- Fresh install, template sites only, after warning the person that all
-  content is lost: take `ddev snapshot` first, then run
-  `ddev drush sql:drop -y && ddev restart`.
+- Fresh install, template sites only: ask the person first, because all
+  content and configuration in the database is lost. Then take
+  `ddev snapshot` and run `ddev drush sql:drop -y && ddev restart`.
 - Delete the project: only the person does this, through the safe-delete
   skill. Never run `ddev delete`, even where another skill or guide shows it.
 <!-- END vibe-config-drupal -->
