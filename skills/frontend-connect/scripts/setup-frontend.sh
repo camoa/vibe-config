@@ -62,10 +62,10 @@ if [ -e "$folder" ] && [ -n "$(ls -A "$folder" 2>/dev/null)" ]; then
   rerun=1
 fi
 
-# 1. Tools and backend. iron-session needs Node 22.13 or later.
+# 1. Tools and backend.
 command -v node >/dev/null 2>&1 || die "node is not installed"
-node -e 'const [a,b]=process.versions.node.split(".").map(Number); process.exit(a>22||(a===22&&b>=13)?0:1)' \
-  || die "Node 22.13 or later is required; found $(node -v)"
+node -e 'process.exit(Number(process.versions.node.split(".")[0])>=24?0:1)' \
+  || die "Node.js 24 LTS or later is required; found $(node -v)"
 command -v npm >/dev/null 2>&1 || die "npm is not installed"
 command -v mkcert >/dev/null 2>&1 || die "mkcert is not installed; DDEV needs it, run the machine-check skill"
 command -v ddev >/dev/null 2>&1 || die "ddev is not installed; run the machine-check skill to set it up"
@@ -116,3 +116,11 @@ git check-ignore -q .env.local \
 echo "App folder: $folder"
 echo "Backend URL: $backend_url"
 echo "Start command: cd $folder && npm run dev"
+echo ""
+echo "Next steps:"
+echo "1. Open the backend's login link in your browser. For a new one, run: cd $backend && ddev drush uli"
+echo "2. Run the start command above."
+echo "3. Open http://localhost:3000 and click Sign in. You go straight through, with no password."
+echo "4. Tell your agent what your app needs to store."
+echo ""
+echo "npm may report high severity vulnerabilities. They come from the lint tooling create-next-app adds (eslint-config-next, through braces), not the running app. Leave them, and never run npm audit fix --force: it breaks the pinned versions."

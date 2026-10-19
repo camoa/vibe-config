@@ -10,7 +10,7 @@ This skill gives the person a Next.js app wired to their Drupal backend for sign
 ## Before you start
 
 1. Run the machine-check skill first: `bash scripts/check-machine.sh` in that skill. Go on only when its JSON says `ready` is true. Otherwise, show the person what it reports and stop.
-2. Node 22.13 or later and `mkcert` must be installed. The script checks both.
+2. Node.js 24 LTS or later and `mkcert` must be installed. The script checks both.
 3. The backend must be running, and it must carry the Simple OAuth client `nextjs` with redirect URI `http://localhost:3000/api/auth/callback`. A backend made by backend-setup at its default template ref has it.
 4. Propose an app folder beside the backend folder, for example `<backend-folder>-app`. It must not exist yet, or must be empty. Tell the person the path and wait for their agreement before you run the script.
 
@@ -31,15 +31,23 @@ The script does these steps in order:
 5. It sets the `dev` script so `npm run dev` exports `NODE_EXTRA_CA_CERTS` from `mkcert -CAROOT` before `next dev`. Node rejects DDEV's mkcert certificate without it and reads the variable only at launch. npm runs scripts through `sh`, so this does not work under plain Windows cmd.
 6. It writes `.env.local` once, with `DRUPAL_BASE_URL`, `DRUPAL_CLIENT_ID`, `DRUPAL_SCOPE`, `APP_URL` and a random `SESSION_SECRET`.
 7. It stops unless git confirms `.env.local` is ignored.
-8. It prints `App folder:`, `Backend URL:` and the start command. Give them to the person.
+8. It prints `App folder:`, `Backend URL:`, the start command and the next steps. Give them to the person.
+
+npm may report "high severity vulnerabilities". They come from the lint tooling create-next-app adds (`eslint-config-next`, through `braces`), not the running app. Leave them, and never run `npm audit fix --force`: it breaks the pinned versions.
 
 No Drupal host sits in the app's source. To point the app at another backend, edit `DRUPAL_BASE_URL` in `.env.local` only.
 
 Running the script again on an app it made skips create-next-app and the install, copies the app files over the app again, and never touches `.env.local`.
 
+## The next step
+
+Tell the person, in plain words: open the backend's login link, run `npm run dev`, click Sign in, then tell you what the app needs to store.
+
 ## Sign-in and logout
 
-Sign-in uses Drupal's own login form. Logout drops the tokens from the app's session and then sends the person to Drupal's logout page, which asks for one confirm click. That ends the Drupal login.
+Sign-in uses Drupal's own login form. To sign in, open the backend's login link first, or run `ddev drush uli` in the backend folder for a new one if it expired. Then click Sign in. The `nextjs` client skips the consent screen, so a person logged in to Drupal goes straight through with no password.
+
+Logout drops the tokens from the app's session and then sends the person to Drupal's logout page, which asks for one confirm click. That ends the Drupal login. Logout ends on Drupal's sign-in page, which is expected; the person goes back to the app's address, http://localhost:3000, to sign in again.
 
 In code you write for the app, signed in means the session holds an access token, never just a name. Use `isSignedIn` in `lib/auth-state.ts`.
 
@@ -51,7 +59,7 @@ Simple OAuth has no revoke endpoint, so a token already issued stays valid for u
 
 After you fix the cause, run the script again on the same folder.
 
-- Node is older than 22.13: install a newer Node through the machine-check skill's advice.
+- Node.js is older than 24: install Node.js 24 LTS or later through the machine-check skill's advice.
 - The backend did not answer: run `ddev start` in the backend folder.
 - The folder exists and is not empty: pick another folder, or ask the person.
 - `create-next-app` or `npm install` fails: show the person the output. A partly made app folder is not a valid rerun target until `package.json` lists `openid-client`; remove it with the person's agreement and run again.

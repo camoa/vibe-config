@@ -69,12 +69,18 @@ runtime_known=false
 have docker && runtime_known=true
 node_installed=false; node_version=""
 if have node; then node_installed=true; node_version=$(node -v 2>/dev/null); fi
+node_major=${node_version#v}; node_major=${node_major%%.*}
+node_ok=false
+case "$node_major" in
+  ''|*[!0-9]*) ;;
+  *) [ "$node_major" -ge 24 ] && node_ok=true ;;
+esac
 npm_installed=false; npm_version=""
 if have npm; then npm_installed=true; npm_version=$(npm -v 2>/dev/null); fi
 
 ready=false
 if [ "$os" != unsupported ] && [ "$runtime_running" = true ] && [ "$ddev_installed" = true ] \
-  && [ "$node_installed" = true ] && [ "$npm_installed" = true ]; then
+  && [ "$node_ok" = true ] && [ "$npm_installed" = true ]; then
   ready=true
 fi
 
@@ -113,6 +119,9 @@ if [ "$node_installed" != true ]; then
   else
     add_step node "Install nvm from https://github.com/nvm-sh/nvm, then run: nvm install --lts" false
   fi
+elif [ "$node_ok" != true ]; then
+  node_old="Node.js $node_version is too old; Node.js 24 LTS or later is needed. Install the LTS from https://nodejs.org/en/download, or run nvm install --lts (nvm) or fnm install --lts (fnm)."
+  if [ "$os" = macos ]; then add_step node "$node_old" true; else add_step node "$node_old" false; fi
 fi
 if [ "$npm_installed" != true ]; then
   if [ "$os" = macos ]; then
@@ -133,7 +142,7 @@ else
   echo "Operating system: $os"
   echo "Container runtime: $provider (running: $runtime_running)"
   echo "DDEV installed: $ddev_installed"
-  echo "Node.js installed: $node_installed; npm installed: $npm_installed"
+  echo "Node.js installed: $node_installed${node_major:+ (major $node_major, needs 24 or later)}; npm installed: $npm_installed"
   if [ "$ready" = true ]; then
     echo "Ready: yes. Nothing more to install."
   else
