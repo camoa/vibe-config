@@ -1,4 +1,4 @@
-<!-- BEGIN vibe-config-drupal -->
+<!-- BEGIN vibe-config -->
 ## Drupal backend: standing rules
 
 This block is written by the backend-setup skill. Running setup again replaces
@@ -30,4 +30,4 @@ the text between the BEGIN and END markers; keep your own notes outside them.
   `ddev snapshot` and run `ddev drush sql:drop -y && ddev restart`.
 - Delete the project: only the person does this, through the safe-delete
   skill. Never run `ddev delete`, even where another skill or guide shows it.
-<!-- END vibe-config-drupal -->
+<!-- END vibe-config -->
