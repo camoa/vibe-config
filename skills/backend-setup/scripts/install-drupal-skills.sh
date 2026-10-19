@@ -50,6 +50,7 @@ dest="$folder/.claude/skills"
 for skill in "${skills[@]}"; do
   [ -f "$tmp/skills/$skill/SKILL.md" ] || die "$skill/SKILL.md not found at $ref"
 done
+[ -f "$tmp/LICENSE" ] || die "LICENSE not found at $ref"
 mkdir -p "$dest"
 for skill in "${skills[@]}"; do
   rm -rf "${dest:?}/$skill"

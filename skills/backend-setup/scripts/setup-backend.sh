@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Create a local Drupal backend: clone the template at a pinned ref into a new
-# folder, start it with DDEV, check the home page and print a login link.
+# folder, start it with DDEV, check the login page and print a login link.
 set -euo pipefail
 
 # Placeholder until the template is published; pass --source meanwhile.
