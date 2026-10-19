@@ -24,12 +24,12 @@ Show the summary to the person. Read the JSON yourself.
 ## How to read the JSON
 
 - `os`: `macos`, `wsl2`, `linux` or `unsupported`.
-- `ready`: `true` when the container runtime runs, DDEV is installed, and Node.js and npm are installed.
+- `ready`: `true` when the container runtime runs, DDEV is installed, Node.js 24 LTS or later is installed, and npm is installed.
 - `checks.container`: the container runtime, with three keys.
   - `running`: `true` when the runtime answers.
   - `provider`: DDEV's platform name when DDEV did the check, such as `orbstack` or `linux-docker`. Otherwise `orbstack`, `colima`, `docker-desktop` or `unknown`. It is `none` when neither DDEV nor Docker is installed.
   - `via`: how it checked: `ddev-dockercheck`, `docker-info` or `none`.
-- `checks.ddev`, `checks.node`, `checks.npm`: each has `installed` (`true` or `false`) and `version` (empty when not installed).
+- `checks.ddev`, `checks.node`, `checks.npm`: each has `installed` (`true` or `false`) and `version` (empty when not installed). A Node.js older than 24 makes `ready` false and adds a `node` step.
 - `next_steps`: an array of objects with `piece`, `step` and `person_runs`. `piece` is `os`, `container`, `ddev`, `node` or `npm`. `step` is the step's text, naming the command to run or the web address to open. When `person_runs` is `true`, ask the person to do the step. Run the check again afterwards.
 
 When `ready` is `true`, go on to the next stage.

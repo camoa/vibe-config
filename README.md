@@ -48,7 +48,7 @@ To pick one skill and one agent:
 npx skills add camoa/vibe-config --skill machine-check -a codex
 ```
 
-To list the skills without installing them, add `--list`. The CLI itself needs Node.js 22.20 or
+To list the skills without installing them, add `--list`. The CLI itself needs Node.js 24 LTS or
 later.
 
 ## What you need
@@ -56,7 +56,7 @@ later.
 - Docker, or another container runtime DDEV supports, such as OrbStack or Colima.
 - [DDEV](https://ddev.com), which runs the local Drupal site, and `mkcert`, which DDEV's install
   sets up.
-- Node.js 22.20 or later and npm, for the skills CLI and the Next.js app.
+- Node.js 24 LTS or later and npm, for the skills CLI and the Next.js app.
 
 The machine-check skill checks these and tells you what is missing.
 
