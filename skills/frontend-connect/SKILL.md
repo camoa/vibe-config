@@ -41,6 +41,8 @@ Running the script again on an app it made skips create-next-app and the install
 
 Sign-in uses Drupal's own login form. Logout drops the tokens from the app's session and then sends the person to Drupal's logout page, which asks for one confirm click. That ends the Drupal login.
 
+In code you write for the app, signed in means the session holds an access token, never just a name. Use `isSignedIn` in `lib/auth-state.ts`.
+
 Simple OAuth has no revoke endpoint, so a token already issued stays valid for up to 300 seconds after logout, and a refresh token until its lifetime ends. Tell the person this if they ask how final a logout is.
 
 ## When a step fails
