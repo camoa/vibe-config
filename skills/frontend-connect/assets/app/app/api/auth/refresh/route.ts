@@ -5,8 +5,10 @@ import { getSession } from "@/lib/session";
 
 export async function GET(request: Request) {
   const next = new URL(request.url).searchParams.get("next") ?? "/";
-  const target =
-    appUrl(next).origin === appUrl("/").origin ? next : "/";
+  let target = "/";
+  try {
+    if (appUrl(next).origin === appUrl("/").origin) target = next;
+  } catch {}
   const session = await getSession();
   if (!session.refreshToken) return NextResponse.redirect(appUrl(target));
   try {
