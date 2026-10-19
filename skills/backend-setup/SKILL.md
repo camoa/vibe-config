@@ -21,7 +21,7 @@ Run this skill's script:
 bash <this-skill-folder>/scripts/setup-backend.sh [--source <git URL or path>] [--ref <tag, branch or commit>] <project-folder>
 ```
 
-- `--source` is the template's git URL or a local path. The default is https://github.com/camoa/vibe-config-drupal-backend.git.
+- `--source` is the template's git URL or a local path. The default is https://github.com/camoa/vibe-config-backend.git.
 - `--ref` is a template tag, branch or commit. The default is `v0.1.0`, the template release these skills were tested with. `--ref main` gets the latest template. `--help` prints both defaults.
 
 The script does these steps in order:
@@ -29,7 +29,7 @@ The script does these steps in order:
 1. It clones the template at the requested ref into the folder. The project then sits on a local branch `main` that tracks nothing, and the template's remote is named `template`. The person can add their own `origin`.
 2. It runs `ddev start`. The template's start hook installs Drupal, so this step takes about a minute.
 3. It checks that the login page, `/user/login`, answers 200. The template may close the front page to visitors, so the script does not check it.
-4. It writes the vibe-config-drupal rules block into the project's `AGENTS.md` (`scripts/write-agents-block.sh`).
+4. It writes the vibe-config rules block into the project's `AGENTS.md` (`scripts/write-agents-block.sh`).
 5. It installs the pinned `drupal-ddev` and `drupal-config-mgmt` skills into the project's `.claude/skills/` (`scripts/install-drupal-skills.sh`).
 6. It prints a `Site URL:` line and a `Login link:` line. Give both to the person.
 

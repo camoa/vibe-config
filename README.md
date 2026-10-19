@@ -1,15 +1,42 @@
-# vibe-config-drupal
+# vibe-config
 
-Agent skills that set up Drupal as the backend of a Next.js app, in the slot Supabase usually fills.
-They are for people who build with an AI coding agent and do not know Drupal: the agent does the
-Drupal work as configuration and contributed modules, not custom code.
+Configuration costs less to own than code, and it behaves more predictably. Code your agent writes
+is yours to maintain, secure and debug; it can come out different on every run, and someone has to
+read it before trusting it. Configuration chooses from options that maintained modules already
+define and test, so their maintainers and a security team carry most of the upkeep. It is
+declarative and described by a schema, and the same configuration gives the same site, so
+`config:status` shows any difference. It still needs care: it lives in `config/sync`, is reviewed
+like code, and depends on the module versions pinned in `composer.lock`, so the point is less to
+own, not nothing.
+
+These agent skills give your Next.js app a real backend on that basis: data, an API, logins,
+permissions, and an admin screen where people who do not code manage content. Your AI coding agent
+sets it up and configures it, so you keep almost no backend code of your own. It fills the slot
+Supabase usually fills.
+
+## What runs underneath
+
+The backend is [Drupal](https://www.drupal.org), a mature open-source CMS and framework. The agent
+builds the data model, the API and the permissions as Drupal configuration and contributed modules,
+not custom code. That is why there is so little code for you to own.
+
+Drupal suits this job for four reasons:
+
+- Content editors get a ready-made admin screen to add and change content.
+- Its permission system sets, role by role, who may see or change each kind of content.
+- Thousands of contributed modules cover common needs, so the agent installs and configures one
+  instead of writing it.
+- A security team reviews reported problems and publishes advisories for core and for covered
+  modules.
+
+You do not need to know Drupal to use these skills.
 
 ## Install
 
 Run this from your project folder:
 
 ```bash
-npx skills add camoa/vibe-config-drupal
+npx skills add camoa/vibe-config
 ```
 
 The [skills CLI](https://github.com/vercel-labs/skills) asks which skills to install and for which
@@ -18,7 +45,7 @@ agents. It works with Claude Code, Codex, Cursor and many other agents.
 To pick one skill and one agent:
 
 ```bash
-npx skills add camoa/vibe-config-drupal --skill machine-check -a codex
+npx skills add camoa/vibe-config --skill machine-check -a codex
 ```
 
 To list the skills without installing them, add `--list`. The CLI itself needs Node.js 22.20 or
@@ -43,7 +70,7 @@ The machine-check skill checks these and tells you what is missing.
 | `safe-delete` | Picks the mildest reset, and hands you the command to delete a project yourself. |
 
 backend-setup clones the backend template,
-[camoa/vibe-config-drupal-backend](https://github.com/camoa/vibe-config-drupal-backend), at the tag
+[camoa/vibe-config-backend](https://github.com/camoa/vibe-config-backend), at the tag
 `v0.1.0`. It also installs two skills from
 [grasmash/drupal-claude-skills](https://github.com/grasmash/drupal-claude-skills) (MIT),
 `drupal-ddev` and `drupal-config-mgmt`, at a pinned commit into your backend project's
@@ -65,6 +92,8 @@ terminal, which asks you to type the project name.
 
 - Local only. The skills set up a DDEV site on your computer. There is no hosting or deploy step
   yet.
+- The API the backend template ships is read-only: the app reads content and signs people in.
+  Writing through the API is off until you or your agent turn it on.
 - macOS is untested. On Windows, the skills need WSL2.
 - The login refresh is safe within one server process, which is what `npm run dev` and a single
   `next start` run. Several server processes behind one app can sign a person out when they refresh
@@ -79,4 +108,4 @@ terminal, which asks you to type the project name.
 ## Licence
 
 This repository is MIT licensed; see [LICENSE](LICENSE). The backend template it clones,
-camoa/vibe-config-drupal-backend, is GPL-2.0-or-later.
+camoa/vibe-config-backend, is GPL-2.0-or-later.

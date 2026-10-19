@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Write or refresh the vibe-config-drupal block of standing rules in
+# Write or refresh the vibe-config block of standing rules in
 # <project-folder>/AGENTS.md. Text outside the markers is left as it is.
 set -euo pipefail
 
@@ -8,8 +8,8 @@ die() { echo "Error: $*" >&2; exit 1; }
 [ $# -eq 1 ] || die "usage: $(basename "$0") <project-folder>"
 [ -d "$1" ] || die "$1 is not a folder"
 
-begin='<!-- BEGIN vibe-config-drupal -->'
-end='<!-- END vibe-config-drupal -->'
+begin='<!-- BEGIN vibe-config -->'
+end='<!-- END vibe-config -->'
 asset="$(dirname "$0")/../assets/agents-block.md"
 target="$1/AGENTS.md"
 
@@ -36,4 +36,4 @@ else
   cat "$tmp" > "$target"
   rm -f "$tmp"
 fi
-echo "Wrote the vibe-config-drupal block to $target"
+echo "Wrote the vibe-config block to $target"

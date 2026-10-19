@@ -3,7 +3,7 @@
 # folder, start it with DDEV, check the login page and print a login link.
 set -euo pipefail
 
-DEFAULT_SOURCE="https://github.com/camoa/vibe-config-drupal-backend.git"
+DEFAULT_SOURCE="https://github.com/camoa/vibe-config-backend.git"
 DEFAULT_REF="v0.1.0"
 # An inherited CDPATH would make cd print a path or pick another folder.
 CDPATH=
