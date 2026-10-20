@@ -42,6 +42,16 @@ npx skills add camoa/vibe-config
 The [skills CLI](https://github.com/vercel-labs/skills) asks which skills to install and for which
 agents. It works with Claude Code, Codex, Cursor and many other agents.
 
+To skip the questions and install every skill for Claude Code:
+
+```bash
+npx skills add camoa/vibe-config --skill '*' -a claude-code -y
+```
+
+For another agent, change the `-a` name, for example `-a cursor` or `-a codex`. The skills go into
+the current project folder by default, so run the command from the folder where you will build
+your app.
+
 To pick one skill and one agent:
 
 ```bash
