@@ -76,6 +76,19 @@ backend-setup clones the backend template,
 `drupal-ddev` and `drupal-config-mgmt`, at a pinned commit into your backend project's
 `.claude/skills/` folder, with their licence. This repository does not include them.
 
+## What security scanners flag
+
+The skills CLI shows ratings from outside security scanners. These flags stay, because the skills
+need what they flag:
+
+- machine-check runs read-only commands, such as `uname`, `docker info`, `ddev version` and
+  `node -v`, and reports their output as JSON. It installs, starts and changes nothing.
+- Some machine-check steps say `sudo systemctl start docker`. That is text for you to run
+  yourself. The script never runs `sudo`.
+- backend-setup downloads content that other people wrote: the backend template at its tag, and
+  the two grasmash skills at a pinned commit. Your agent later reads the template and follows
+  those skills, so read them before you trust them, as with any code you download.
+
 ## Usage
 
 Things to say to your agent, in the order a newcomer would go:

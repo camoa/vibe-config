@@ -108,7 +108,7 @@ if [ "$runtime_running" != true ]; then
 fi
 if [ "$ddev_installed" != true ]; then
   case "$os" in
-    macos) add_step ddev "In Terminal run: curl -fsSL https://ddev.com/install.sh | bash. It may ask for your password." true ;;
+    macos) add_step ddev "Install DDEV with the macOS steps at https://docs.ddev.com/en/stable/users/install/ddev-installation/" true ;;
     wsl2) add_step ddev "Run the DDEV Windows installer from Windows, as https://docs.ddev.com/en/stable/users/install/ddev-installation/ describes." true ;;
     *) add_step ddev "Install DDEV with the Linux steps at https://docs.ddev.com/en/stable/users/install/ddev-installation/" true ;;
   esac
