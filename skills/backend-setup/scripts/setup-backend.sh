@@ -127,3 +127,4 @@ login_link="$(ddev drush user:login | tr -d '\r')" \
   || die "ddev drush user:login failed; the site is up at $site_url"
 echo "Site URL: $site_url"
 echo "Login link: $login_link"
+echo "The login link works once and expires. For a new one, run: cd \"$folder\" && ddev drush uli"

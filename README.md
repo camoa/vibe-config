@@ -42,6 +42,16 @@ npx skills add camoa/vibe-config
 The [skills CLI](https://github.com/vercel-labs/skills) asks which skills to install and for which
 agents. It works with Claude Code, Codex, Cursor and many other agents.
 
+To skip the questions and install every skill for Claude Code:
+
+```bash
+npx skills add camoa/vibe-config --skill '*' -a claude-code -y
+```
+
+For another agent, change the `-a` name, for example `-a cursor` or `-a codex`. The skills go into
+the current project folder by default, so run the command from the folder where you will build
+your app.
+
 To pick one skill and one agent:
 
 ```bash
@@ -75,6 +85,23 @@ backend-setup clones the backend template,
 [grasmash/drupal-claude-skills](https://github.com/grasmash/drupal-claude-skills) (MIT),
 `drupal-ddev` and `drupal-config-mgmt`, at a pinned commit into your backend project's
 `.claude/skills/` folder, with their licence. This repository does not include them.
+
+## What security scanners flag
+
+The skills CLI shows ratings from outside security scanners. These are the main things they flag.
+They stay, because the skills need them:
+
+- machine-check runs read-only commands, such as `uname`, `docker info`, `ddev version` and
+  `node -v`, and reports their output as JSON. It installs, starts and changes nothing.
+- Some machine-check steps say `sudo systemctl start docker`. That is text for you to run
+  yourself. The script never runs `sudo`.
+- backend-setup downloads content that other people wrote: the backend template at its tag, and
+  the two grasmash skills at a pinned commit. Your agent later reads the template and follows
+  those skills, so read them before you trust them, as with any code you download.
+- backend-setup's `get-token.sh` talks only to your local backend. It uses curl's `-k` because
+  DDEV signs the site with its own certificate. It prints a short-lived access token to stdout,
+  for your agent to keep in a shell variable.
+- frontend-connect runs `npx create-next-app` and `npm install`, which download packages from npm.
 
 ## Usage
 

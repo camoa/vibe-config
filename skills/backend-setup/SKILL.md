@@ -33,11 +33,15 @@ The script does these steps in order:
 5. It installs the pinned `drupal-ddev` and `drupal-config-mgmt` skills into the project's `.claude/skills/` (`scripts/install-drupal-skills.sh`).
 6. It prints a `Site URL:` line and a `Login link:` line. Give both to the person, and tell them to open the login link in their browser. It signs them in to Drupal with no password, so the app's Sign in later goes straight through.
 
-The admin password is random. To log in later, run `ddev drush user:login` in the project folder.
+The login link works once and expires after 24 hours. The admin password is random. To log in again, run `ddev drush uli` in the project folder for a new link.
 
 Running the script again on a folder it set up skips the clone and refreshes `AGENTS.md`. It keeps the template that folder already holds: when `--source` or `--ref` asks for another, it prints a note, and the person sets up a new folder to switch. A new `AGENTS.md` is untracked in the project's git, and so is the new `.claude/` folder. Offer to commit both.
 
 The One Line Installer is an optional helper for getting DDEV. This skill does not need it.
+
+## A token for checking the API
+
+To check the API as a signed-in person, get an access token with `bash <this-skill-folder>/scripts/get-token.sh [--name <user>] <project-folder>`. It signs in through `ddev drush uli`, then runs the app's own sign-in flow with the `nextjs` client, so the token has the app's scope and the user's permissions. It needs no password or secret and no running app. It prints only the token, which lasts 5 minutes. Keep it in a shell variable; never print it, write it to a file or commit it. The `AGENTS.md` block says how to use it.
 
 ## Messages from the template
 

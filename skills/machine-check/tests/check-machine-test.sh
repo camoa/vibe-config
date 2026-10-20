@@ -101,7 +101,7 @@ for os in Darwin Linux; do
 done
 iso_start Darwin; iso_run
 expect "macos container person" 'docker-installation/ describes, then open it once.","person_runs":true'
-expect "macos ddev person" 'It may ask for your password.","person_runs":true'
+expect "macos ddev person" 'the macOS steps at https://docs.ddev.com/en/stable/users/install/ddev-installation/","person_runs":true'
 expect "macos node person" 'https://nodejs.org/en/download","person_runs":true'
 stub uname "if [ \"\$1\" = -s ]; then echo Linux; else echo 5.15.0-Microsoft-standard-WSL2; fi"; iso_run
 for piece in container ddev node npm; do expect "wsl2 step $piece" "\"piece\":\"$piece\""; done
