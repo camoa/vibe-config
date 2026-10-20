@@ -22,7 +22,7 @@ bash <this-skill-folder>/scripts/setup-backend.sh [--source <git URL or path>] [
 ```
 
 - `--source` is the template's git URL or a local path. The default is https://github.com/camoa/vibe-config-backend.git.
-- `--ref` is a template tag, branch or commit. The default is `v0.1.0`, the template release these skills were tested with. `--ref main` gets the latest template. `--help` prints both defaults.
+- `--ref` is a template tag, branch or commit. The default is `v0.1.1`, the template release these skills were tested with. `--ref main` gets the latest template. `--help` prints both defaults.
 
 The script does these steps in order:
 
@@ -35,7 +35,7 @@ The script does these steps in order:
 
 The admin password is random. To log in later, run `ddev drush user:login` in the project folder.
 
-Running the script again on a folder it set up skips the clone and refreshes `AGENTS.md`. A new `AGENTS.md` is untracked in the project's git, and so is the new `.claude/` folder. Offer to commit both.
+Running the script again on a folder it set up skips the clone and refreshes `AGENTS.md`. It keeps the template that folder already holds: when `--source` or `--ref` asks for another, it prints a note, and the person sets up a new folder to switch. A new `AGENTS.md` is untracked in the project's git, and so is the new `.claude/` folder. Offer to commit both.
 
 The One Line Installer is an optional helper for getting DDEV. This skill does not need it.
 

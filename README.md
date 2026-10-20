@@ -71,7 +71,7 @@ The machine-check skill checks these and tells you what is missing.
 
 backend-setup clones the backend template,
 [camoa/vibe-config-backend](https://github.com/camoa/vibe-config-backend), at the tag
-`v0.1.0`. It also installs two skills from
+`v0.1.1`. It also installs two skills from
 [grasmash/drupal-claude-skills](https://github.com/grasmash/drupal-claude-skills) (MIT),
 `drupal-ddev` and `drupal-config-mgmt`, at a pinned commit into your backend project's
 `.claude/skills/` folder, with their licence. This repository does not include them.
