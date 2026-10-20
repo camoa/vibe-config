@@ -28,6 +28,20 @@ the text between the BEGIN and END markers; keep your own notes outside them.
 - The app reads a menu from `/jsonapi/menu_items/<menu>` with the person's
   token, never from `menu_link_content`, which only menu admins can read.
 
+### Check the API as the app sees it
+- Check each change as a visitor and as a signed-in person. A visitor sends
+  no `Authorization` header. For a signed-in person, run the backend-setup
+  skill's `scripts/get-token.sh [--name <user>] <project-folder>`. It prints
+  an access token from the app's `nextjs` client, and the token lasts 5
+  minutes. Send it as `Authorization: Bearer <token>`.
+- Keep the token in a shell variable only. Never print it, write it to a
+  file or commit it.
+- Without `--name` the token is user 1's, and user 1 passes every access
+  check. To check permissions, make an ordinary user with
+  `ddev drush user:create <user>` and pass `--name <user>`.
+- Without `--name` the script also signs in as user 1, so the person's unused
+  login link stops working. Run `ddev drush uli` for a new one if they need it.
+
 ### The three kinds of reset
 - Undo: `ddev snapshot restore --latest` returns the database to the last
   snapshot.

@@ -39,6 +39,10 @@ Running the script again on a folder it set up skips the clone and refreshes `AG
 
 The One Line Installer is an optional helper for getting DDEV. This skill does not need it.
 
+## A token for checking the API
+
+To check the API as a signed-in person, get an access token with `bash <this-skill-folder>/scripts/get-token.sh [--name <user>] <project-folder>`. It signs in through `ddev drush uli`, then runs the app's own sign-in flow with the `nextjs` client, so the token has the app's scope and the user's permissions. It needs no password or secret and no running app. It prints only the token, which lasts 5 minutes. Keep it in a shell variable; never print it, write it to a file or commit it. The `AGENTS.md` block says how to use it.
+
 ## Messages from the template
 
 Watch the `ddev start` output for these two lines.
