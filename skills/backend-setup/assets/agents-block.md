@@ -7,7 +7,8 @@ the text between the BEGIN and END markers; keep your own notes outside them.
 ### Commands
 - Run drush and composer through ddev: `ddev drush ...` and `ddev composer ...`.
   Never run them on the host.
-- Log in with `ddev drush user:login`, which prints a one-time login link.
+- Log in with `ddev drush uli`, which prints a one-time login link that expires
+  after 24 hours. Run it again whenever the person needs to sign in again.
 
 ### Configuration
 - After every configuration change, run `ddev drush cex -y`, then read
