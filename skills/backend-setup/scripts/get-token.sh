@@ -24,18 +24,19 @@ command -v openssl >/dev/null || die "openssl is missing"
 
 cd "$1"
 if [ -n "$name" ]; then
-  uli_out="$(ddev drush uli --name="$name")" || die "ddev drush uli failed"
+  uli_out="$(ddev drush uli --name="$name" | tr -d '\r')" || die "ddev drush uli failed"
 else
-  uli_out="$(ddev drush uli)" || die "ddev drush uli failed"
+  uli_out="$(ddev drush uli | tr -d '\r')" || die "ddev drush uli failed"
 fi
-login_url="$(printf '%s\n' "$uli_out" | grep -E '^https?://' | tail -n 1)"
+login_url="$(printf '%s\n' "$uli_out" | grep -E '^https?://' | tail -n 1 || true)"
 [ -n "$login_url" ] || die "ddev drush uli printed no login link"
 base="${login_url%%/user/reset/*}"
 
 jar="$(mktemp)"
 trap 'rm -f "$jar"' EXIT
 
-status="$(curl -sk -c "$jar" -b "$jar" -o /dev/null -w '%{http_code}' "$login_url")"
+status="$(curl -sSk -c "$jar" -b "$jar" -o /dev/null -w '%{http_code}' "$login_url")" \
+  || die "could not reach the login link at $base"
 case "$status" in
   302|303) ;;
   *) die "the login link answered $status, not a redirect; is the user blocked?" ;;
@@ -47,22 +48,26 @@ challenge="$(printf '%s' "$verifier" | openssl dgst -sha256 -binary | b64url)"
 state="$(openssl rand -hex 16)"
 redirect_enc='http%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fcallback'
 
-location="$(curl -sk -b "$jar" -o /dev/null -w '%{redirect_url}' \
-  "$base/oauth/authorize?response_type=code&client_id=$client_id&redirect_uri=$redirect_enc&scope=$scope&code_challenge=$challenge&code_challenge_method=S256&state=$state")"
+location="$(curl -sSk -b "$jar" -o /dev/null -w '%{redirect_url}' \
+  "$base/oauth/authorize?response_type=code&client_id=$client_id&redirect_uri=$redirect_enc&scope=$scope&code_challenge=$challenge&code_challenge_method=S256&state=$state")" \
+  || die "could not reach $base/oauth/authorize"
 case "$location" in
   "$redirect_uri"*) ;;
   *) die "authorize did not redirect to the app's callback; it sent: ${location:-no redirect}" ;;
 esac
 code="$(printf '%s' "$location" | sed -n 's/.*[?&]code=\([^&]*\).*/\1/p')"
 [ -n "$code" ] || die "no code in the redirect: $location"
+case "$location" in
+  *[?\&]state="$state"|*[?\&]state="$state"\&*) ;;
+  *) die "the redirect does not carry the state this script sent" ;;
+esac
 
 # The code is already URL-encoded in the Location header, so it goes as is.
-response="$(curl -sk -X POST "$base/oauth/token" \
-  --data "grant_type=authorization_code" \
-  --data "client_id=$client_id" \
-  --data "redirect_uri=$redirect_enc" \
-  --data "code=$code" \
-  --data "code_verifier=$verifier")"
+# The body goes on stdin to keep the code and verifier out of the process list.
+response="$(printf 'grant_type=authorization_code&client_id=%s&redirect_uri=%s&code=%s&code_verifier=%s' \
+  "$client_id" "$redirect_enc" "$code" "$verifier" \
+  | curl -sSk -X POST --data @- "$base/oauth/token")" \
+  || die "could not reach $base/oauth/token"
 token="$(printf '%s' "$response" | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')"
 [ -n "$token" ] || die "the token endpoint gave no access token: $response"
 printf '%s\n' "$token"

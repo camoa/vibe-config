@@ -88,8 +88,8 @@ backend-setup clones the backend template,
 
 ## What security scanners flag
 
-The skills CLI shows ratings from outside security scanners. These flags stay, because the skills
-need what they flag:
+The skills CLI shows ratings from outside security scanners. These are the main things they flag.
+They stay, because the skills need them:
 
 - machine-check runs read-only commands, such as `uname`, `docker info`, `ddev version` and
   `node -v`, and reports their output as JSON. It installs, starts and changes nothing.
@@ -98,6 +98,10 @@ need what they flag:
 - backend-setup downloads content that other people wrote: the backend template at its tag, and
   the two grasmash skills at a pinned commit. Your agent later reads the template and follows
   those skills, so read them before you trust them, as with any code you download.
+- backend-setup's `get-token.sh` talks only to your local backend. It uses curl's `-k` because
+  DDEV signs the site with its own certificate. It prints a short-lived access token to stdout,
+  for your agent to keep in a shell variable.
+- frontend-connect runs `npx create-next-app` and `npm install`, which download packages from npm.
 
 ## Usage
 
