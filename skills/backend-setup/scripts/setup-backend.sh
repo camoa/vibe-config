@@ -4,7 +4,7 @@
 set -euo pipefail
 
 DEFAULT_SOURCE="https://github.com/camoa/vibe-config-backend.git"
-DEFAULT_REF="v0.1.0"
+DEFAULT_REF="v0.1.1"
 # An inherited CDPATH would make cd print a path or pick another folder.
 CDPATH=
 script_dir="$(cd "$(dirname "$0")" && pwd -P)"

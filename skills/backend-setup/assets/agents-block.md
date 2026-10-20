@@ -24,6 +24,8 @@ the text between the BEGIN and END markers; keep your own notes outside them.
 - A new block type, or an entity type or bundle whose access ignores "access
   content" (block_content above all): disable it in JSON:API Extras, export,
   commit, then check an anonymous GET of its collection gives 404 or no data.
+- The app reads a menu from `/jsonapi/menu_items/<menu>` with the person's
+  token, never from `menu_link_content`, which only menu admins can read.
 
 ### The three kinds of reset
 - Undo: `ddev snapshot restore --latest` returns the database to the last

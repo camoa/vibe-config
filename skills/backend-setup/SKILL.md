@@ -22,7 +22,7 @@ bash <this-skill-folder>/scripts/setup-backend.sh [--source <git URL or path>] [
 ```
 
 - `--source` is the template's git URL or a local path. The default is https://github.com/camoa/vibe-config-backend.git.
-- `--ref` is a template tag, branch or commit. The default is `v0.1.0`, the template release these skills were tested with. `--ref main` gets the latest template. `--help` prints both defaults.
+- `--ref` is a template tag, branch or commit. The default is `v0.1.1`, the template release these skills were tested with. `--ref main` gets the latest template. `--help` prints both defaults.
 
 The script does these steps in order:
 
